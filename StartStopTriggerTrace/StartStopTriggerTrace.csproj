@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8D9EC87A-27C0-4706-A10B-C9CC49727318}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>StartStopTriggerTrace</RootNamespace>
+    <AssemblyName>StartStopTriggerTrace</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Api\ConfigurationFileApi.cs" />
+    <Compile Include="Client\ApiClient.cs" />
+    <Compile Include="Client\ApiException.cs" />
+    <Compile Include="Client\ApiResponse.cs" />
+    <Compile Include="Client\Configuration.cs" />
+    <Compile Include="Client\ExceptionFactory.cs" />
+    <Compile Include="Client\GlobalConfiguration.cs" />
+    <Compile Include="Client\IApiAccessor.cs" />
+    <Compile Include="Client\IReadableConfiguration.cs" />
+    <Compile Include="Client\SwaggerDateConverter.cs" />
+    <Compile Include="CreateTraceDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateTraceDlg.Designer.cs">
+      <DependentUpon>CreateTraceDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CreateTriggerDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateTriggerDlg.Designer.cs">
+      <DependentUpon>CreateTriggerDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Extensions\ControlExtensions.cs" />
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AlarmRequest.cs" />
+    <Compile Include="Models\CapabilityKey.cs" />
+    <Compile Include="Models\CarrierActionRequest.cs" />
+    <Compile Include="Models\CommunicationProtocol.cs" />
+    <Compile Include="Models\ConfigurationFile.cs" />
+    <Compile Include="Models\ConnectorDetails.cs" />
+    <Compile Include="Models\CreateObjectRequest.cs" />
+    <Compile Include="Models\CreateResponse.cs" />
+    <Compile Include="Models\DataCollectionPlan.cs" />
+    <Compile Include="Models\DataCollectionPlanResponse.cs" />
+    <Compile Include="Models\Equipment.cs" />
+    <Compile Include="Models\EquipmentConnection.cs" />
+    <Compile Include="Models\EquipmentConnectionEquipmentConnectionTemplate.cs" />
+    <Compile Include="Models\EquipmentConnectionTemplate.cs" />
+    <Compile Include="Models\EquipmentConstant.cs" />
+    <Compile Include="Models\EquipmentEquipmentModel.cs" />
+    <Compile Include="Models\EquipmentFactory.cs" />
+    <Compile Include="Models\EquipmentGroup.cs" />
+    <Compile Include="Models\EquipmentModel.cs" />
+    <Compile Include="Models\EquipmentModelCommunicationProtocol.cs" />
+    <Compile Include="Models\EquipmentModelEquipmentConnectionTemplates.cs" />
+    <Compile Include="Models\EquipmentModelEquipmentType.cs" />
+    <Compile Include="Models\EquipmentModelResponse.cs" />
+    <Compile Include="Models\EquipmentModelSupplier.cs" />
+    <Compile Include="Models\EquipmentResponse.cs" />
+    <Compile Include="Models\EventRequest.cs" />
+    <Compile Include="Models\KeycloakToken.cs" />
+    <Compile Include="Models\KeyValuePair.cs" />
+    <Compile Include="Models\OneOfRuleLimit.cs" />
+    <Compile Include="Models\OneOfRuleMaximum.cs" />
+    <Compile Include="Models\OneOfRuleMinimum.cs" />
+    <Compile Include="Models\Page.cs" />
+    <Compile Include="Models\PagePageable.cs" />
+    <Compile Include="Models\PagePageableSort.cs" />
+    <Compile Include="Models\ParameterRequest.cs" />
+    <Compile Include="Models\prJobCreateEnhRequest.cs" />
+    <Compile Include="Models\RemoteCommand.cs" />
+    <Compile Include="Models\Request.cs" />
+    <Compile Include="Models\RequestList.cs" />
+    <Compile Include="Models\Rule.cs" />
+    <Compile Include="Models\Subscriber.cs" />
+    <Compile Include="Models\SuccessResponse.cs" />
+    <Compile Include="Models\TraceCondition.cs" />
+    <Compile Include="Models\TraceDataReport.cs" />
+    <Compile Include="Models\TraceRequest.cs" />
+    <Compile Include="Models\Trigger.cs" />
+    <Compile Include="Models\TriggerAlarmRequest.cs" />
+    <Compile Include="Models\TriggerEventRequest.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
