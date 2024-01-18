@@ -32,11 +32,11 @@
             this.cbEquipment = new System.Windows.Forms.ComboBox();
             this.lbDcps = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnCreateDcp = new System.Windows.Forms.Button();
+            this.btnCreateTraceDcp = new System.Windows.Forms.Button();
             this.btnEditDcp = new System.Windows.Forms.Button();
             this.btnDeleteDcp = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.lbLogs = new System.Windows.Forms.ListBox();
+            this.tbLogs = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -57,6 +57,7 @@
             this.cbEquipment.Name = "cbEquipment";
             this.cbEquipment.Size = new System.Drawing.Size(411, 21);
             this.cbEquipment.TabIndex = 1;
+            this.cbEquipment.SelectedIndexChanged += new System.EventHandler(this.cbEquipment_SelectedIndexChanged);
             // 
             // lbDcps
             // 
@@ -77,16 +78,16 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "Start and Stop Trigger Trace DCPs:";
             // 
-            // btnCreateDcp
+            // btnCreateTraceDcp
             // 
-            this.btnCreateDcp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCreateDcp.Location = new System.Drawing.Point(263, 312);
-            this.btnCreateDcp.Name = "btnCreateDcp";
-            this.btnCreateDcp.Size = new System.Drawing.Size(75, 23);
-            this.btnCreateDcp.TabIndex = 4;
-            this.btnCreateDcp.Text = "Create";
-            this.btnCreateDcp.UseVisualStyleBackColor = true;
-            this.btnCreateDcp.Click += new System.EventHandler(this.btnCreateDcp_Click);
+            this.btnCreateTraceDcp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCreateTraceDcp.Location = new System.Drawing.Point(263, 312);
+            this.btnCreateTraceDcp.Name = "btnCreateTraceDcp";
+            this.btnCreateTraceDcp.Size = new System.Drawing.Size(75, 23);
+            this.btnCreateTraceDcp.TabIndex = 4;
+            this.btnCreateTraceDcp.Text = "Create";
+            this.btnCreateTraceDcp.UseVisualStyleBackColor = true;
+            this.btnCreateTraceDcp.Click += new System.EventHandler(this.btnCreateTraceDcp_Click);
             // 
             // btnEditDcp
             // 
@@ -107,6 +108,7 @@
             this.btnDeleteDcp.TabIndex = 6;
             this.btnDeleteDcp.Text = "Delete";
             this.btnDeleteDcp.UseVisualStyleBackColor = true;
+            this.btnDeleteDcp.Click += new System.EventHandler(this.btnDeleteDcp_Click);
             // 
             // label3
             // 
@@ -117,33 +119,34 @@
             this.label3.TabIndex = 8;
             this.label3.Text = "Logs:";
             // 
-            // lbLogs
+            // tbLogs
             // 
-            this.lbLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.tbLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbLogs.FormattingEnabled = true;
-            this.lbLogs.Location = new System.Drawing.Point(12, 367);
-            this.lbLogs.Name = "lbLogs";
-            this.lbLogs.Size = new System.Drawing.Size(488, 186);
-            this.lbLogs.TabIndex = 7;
+            this.tbLogs.Location = new System.Drawing.Point(12, 364);
+            this.tbLogs.Multiline = true;
+            this.tbLogs.Name = "tbLogs";
+            this.tbLogs.Size = new System.Drawing.Size(488, 203);
+            this.tbLogs.TabIndex = 9;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(512, 579);
+            this.Controls.Add(this.tbLogs);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.lbLogs);
             this.Controls.Add(this.btnDeleteDcp);
             this.Controls.Add(this.btnEditDcp);
-            this.Controls.Add(this.btnCreateDcp);
+            this.Controls.Add(this.btnCreateTraceDcp);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lbDcps);
             this.Controls.Add(this.cbEquipment);
             this.Controls.Add(this.label1);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -155,11 +158,11 @@
         private System.Windows.Forms.ComboBox cbEquipment;
         private System.Windows.Forms.ListBox lbDcps;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnCreateDcp;
+        private System.Windows.Forms.Button btnCreateTraceDcp;
         private System.Windows.Forms.Button btnEditDcp;
         private System.Windows.Forms.Button btnDeleteDcp;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ListBox lbLogs;
+        private System.Windows.Forms.TextBox tbLogs;
     }
 }
 

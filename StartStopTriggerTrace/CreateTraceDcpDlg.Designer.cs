@@ -1,6 +1,6 @@
 ﻿namespace StartStopTriggerTrace
 {
-    partial class CreateTraceDlg
+    partial class CreateTraceDcpDlg
     {
         /// <summary>
         /// Required designer variable.
@@ -183,6 +183,7 @@
             this.btnDeleteStartTrigger.TabIndex = 9;
             this.btnDeleteStartTrigger.Text = "Delete Start Trigger";
             this.btnDeleteStartTrigger.UseVisualStyleBackColor = true;
+            this.btnDeleteStartTrigger.Click += new System.EventHandler(this.btnDeleteStartTrigger_Click);
             // 
             // btnCreateStartTrigger
             // 
@@ -279,6 +280,7 @@
             this.btnCreateDcp.TabIndex = 17;
             this.btnCreateDcp.Text = "Create DCP";
             this.btnCreateDcp.UseVisualStyleBackColor = true;
+            this.btnCreateDcp.Click += new System.EventHandler(this.btnCreateDcp_Click);
             // 
             // btnCancel
             // 
@@ -289,8 +291,9 @@
             this.btnCancel.TabIndex = 18;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
-            // CreateTraceDlg
+            // CreateTraceDcpDlg
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -310,8 +313,9 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtTraceDescription);
             this.Controls.Add(this.label1);
-            this.Name = "CreateTraceDlg";
+            this.Name = "CreateTraceDcpDlg";
             this.Text = "CreateTraceDlg";
+            this.Load += new System.EventHandler(this.CreateTraceDlg_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
