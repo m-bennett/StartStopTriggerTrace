@@ -203,6 +203,7 @@
             this.btnDeleteStopTrigger.TabIndex = 11;
             this.btnDeleteStopTrigger.Text = "Delete Stop Trigger";
             this.btnDeleteStopTrigger.UseVisualStyleBackColor = true;
+            this.btnDeleteStopTrigger.Click += new System.EventHandler(this.btnDeleteStopTrigger_Click);
             // 
             // btnCreateStopTrigger
             // 

@@ -142,6 +142,7 @@
     <Compile Include="Models\EquipmentGroup.cs" />
     <Compile Include="Models\EquipmentModelCommunicationProtocol.cs" />
     <Compile Include="Models\EquipmentResponse.cs" />
+    <Compile Include="Models\EventReport.cs" />
     <Compile Include="Models\KeycloakToken.cs" />
     <Compile Include="Models\KeyValuePair.cs" />
     <Compile Include="Models\OneOfRuleLimit.cs" />
@@ -169,6 +170,9 @@
     <Compile Include="SapienceApiHandler.cs" />
     <EmbeddedResource Include="CreateTraceDcpDlg.resx">
       <DependentUpon>CreateTraceDcpDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateTriggerDlg.resx">
+      <DependentUpon>CreateTriggerDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

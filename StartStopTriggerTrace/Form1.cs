@@ -1,11 +1,13 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SapienceDcpManager.Models;
 using StartStopTriggerTrace.Extensions;
 using StartStopTriggerTrace.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,8 +25,79 @@ namespace StartStopTriggerTrace
         {
             InitializeComponent();
 
+            DcpReceived += Form_DcpReceived;
+
+            Task.Run(StartHttpListener);
+
             parameterList = new List<Parameter>();
             eventList = new List<Event>();
+        }
+
+        private void Form_DcpReceived(object sender, string e)
+        {
+            
+        }
+
+        private HttpListener listener;
+
+        private event EventHandler<String> DcpReceived;
+
+        private bool running = true;
+
+        private void StartHttpListener()
+        {
+            listener = new HttpListener();
+            var prefix = string.Format(SapienceApiHandler.Instance.EndpointURL);
+            listener.Prefixes.Add(prefix);
+            try
+            {
+                listener.Start();
+
+                while (running)
+                {
+                    var context = listener.GetContext();
+                    Console.WriteLine("*********** Begin receive data ****************");
+
+                    var request = context.Request;
+                    var response = context.Response;
+                    var requestData = GetRequestPostData(request);
+
+                    var eventReport = JsonConvert.DeserializeObject<EventReport>(requestData);
+
+                    Console.WriteLine("*********** End receive data ****************");
+                    response.StatusCode = (int)HttpStatusCode.OK;
+                    response.Close();
+                    DcpReceived?.Invoke(this, requestData);
+                }
+
+                listener.Stop();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //requestResultTb.PerformSafeOperation(() =>
+                //{
+                //    requestResultTb.AppendText("HTTP Listener Failed to Start:");
+                //    requestResultTb.AppendText("\r\n");
+                //    requestResultTb.AppendText(e.ToString());
+                //});
+            }
+        }
+
+
+        public string GetRequestPostData(HttpListenerRequest request)
+        {
+            if (!request.HasEntityBody)
+            {
+                return null;
+            }
+            using (System.IO.Stream body = request.InputStream) // here we have data
+            {
+                using (System.IO.StreamReader reader = new System.IO.StreamReader(body, request.ContentEncoding))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
         }
 
         private CreateTraceDcpDlg _createTraceDlg;
@@ -34,7 +107,7 @@ namespace StartStopTriggerTrace
             var equipmentConnection = (EquipmentConnectionListItem)cbEquipment.SelectedItem;
 
             ILogForm TraceDcpForm = null;
-            if (equipmentConnection.ConnectionType == ConnectionTypeEnum.EDA)
+            if (equipmentConnection.ConnectionType == ConnectionTypeEnum.GEM)
             {
                 TraceDcpForm = new CreateTraceDcpDlg()
                 {
@@ -44,13 +117,9 @@ namespace StartStopTriggerTrace
                     EventList = eventList
                 };
             }
-            //else if (equipmentConnection.ConnectionType == ConnectionTypeEnum.GEM)
-            //{
-            //    TODO - Add later?
-            //}
             else
             {
-                MessageBox.Show($"Connection type {equipmentConnection.ConnectionType} does not support Trace");
+                MessageBox.Show($"Connection type {equipmentConnection.ConnectionType} does not support Trace.");
             }
 
             TraceDcpForm.CreatedLogMessage += OnMessageLog;

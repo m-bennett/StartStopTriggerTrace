@@ -63,6 +63,7 @@
             this.btnAddTrigger.TabIndex = 2;
             this.btnAddTrigger.Text = "Add Trigger";
             this.btnAddTrigger.UseVisualStyleBackColor = true;
+            this.btnAddTrigger.Click += new System.EventHandler(this.btnAddTrigger_Click);
             // 
             // btnCancel
             // 
@@ -73,6 +74,7 @@
             this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // CreateTriggerDlg
             // 
@@ -85,6 +87,7 @@
             this.Controls.Add(this.label1);
             this.Name = "CreateTriggerDlg";
             this.Text = "CreateTriggerDlg";
+            this.Load += new System.EventHandler(this.CreateTriggerDlg_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

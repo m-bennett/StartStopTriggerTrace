@@ -87,9 +87,11 @@ namespace StartStopTriggerTrace.Models
         {
             get
             {
-                var parameterCondition = $"{Conditions[0].ParameterId.Substring(Conditions[0].ParameterId.LastIndexOf(':')+1)} {Conditions[0]._Operator} {Conditions[0].ParameterValue}";
-                var eventString = EventId.Substring(EventId.LastIndexOf(':')+1);
-                return $"{eventString} : {parameterCondition}";
+                //var parameterCondition = $"{Conditions[0].ParameterId.Substring(Conditions[0].ParameterId.LastIndexOf(':')+1)} {Conditions[0]._Operator} {Conditions[0].ParameterValue}";
+                //var eventString = EventId.Substring(EventId.LastIndexOf(':')+1);
+                //return $"{eventString} : {parameterCondition}";
+
+                return EventId.Substring(EventId.LastIndexOf(':') + 1);
             }
         }
         /// <summary>

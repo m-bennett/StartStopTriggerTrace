@@ -36,31 +36,33 @@ namespace StartStopTriggerTrace
             txtTraceDescription.Text = Equipment.Name + " Trace " + traceId;
         }
 
-        private CreateTriggerDlg _createTriggerDlg;
-
         public event EventHandler<LogMessageEventArgs> CreatedLogMessage;
 
         private void btnCreateStartTrigger_Click(object sender, EventArgs e)
         {
-            _createTriggerDlg = new CreateTriggerDlg();
-            _createTriggerDlg.ShowDialog();
+            var createTriggerDlg = new CreateTriggerDlg()
+            {
+                CollectionEvents = EventList
+            };
 
-            _createTriggerDlg.Dispose();
-            _createTriggerDlg=null;
+            if (createTriggerDlg.ShowDialog(this) == DialogResult.OK)
+            {
+                lbStartTriggers.DisplayMember = "DisplayName";
+                lbStartTriggers.Items.Add(createTriggerDlg.TriggerResult);
+            }
         }
 
         private void btnCreateStopTrigger_Click(object sender, EventArgs e)
         {
-            var createTriggerForm = new CreateTriggerDlg()
+            var createTriggerDlg = new CreateTriggerDlg()
             {
                 CollectionEvents = EventList,
-                Parameters = ParameterList
             };
 
-            if (createTriggerForm.ShowDialog(this) == DialogResult.OK)
+            if (createTriggerDlg.ShowDialog(this) == DialogResult.OK)
             {
                 lbStopTriggers.DisplayMember = "DisplayName";
-                lbStopTriggers.Items.Add(createTriggerForm.TriggerResult);
+                lbStopTriggers.Items.Add(createTriggerDlg.TriggerResult);
             }
         }
 
@@ -119,6 +121,14 @@ namespace StartStopTriggerTrace
                 return;
 
             lbStartTriggers.Items.Remove(lbStartTriggers.SelectedItem);
+        }
+
+        private void btnDeleteStopTrigger_Click(object sender, EventArgs e)
+        {
+            if (lbStopTriggers.SelectedItem == null)
+                return;
+
+            lbStopTriggers.Items.Remove(lbStopTriggers.SelectedItem);
         }
     }
 }
