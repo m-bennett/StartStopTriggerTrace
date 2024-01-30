@@ -490,11 +490,7 @@ namespace StartStopTriggerTrace
 				request.CollectionCount = null;
 				request.IsCyclical = null;
 				request.GroupSize = null;
-				foreach( Parameter param in dcpInfo.Parameters )
-				{
-					request.ParameterRequestsList.Add(new ParameterRequest(param.Id));
-				}
-
+				request.ParameterRequestsList = null;
 			}
 			else if( dcpInfo.RequestType == RequestType.Alarm )
 			{

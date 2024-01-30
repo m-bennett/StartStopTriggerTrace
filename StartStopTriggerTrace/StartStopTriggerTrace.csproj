@@ -113,6 +113,7 @@
       <DependentUpon>CreateTriggerDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="DcpInfo.cs" />
+    <Compile Include="DcpListener.cs" />
     <Compile Include="EquipmentConnectionListItem.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="Extensions\ControlExtensions.cs" />
@@ -122,6 +123,8 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="GEM Trace DCP\GemTraceDcpTrigger.cs" />
+    <Compile Include="GEM Trace DCP\GemTraceDcpWithTriggers.cs" />
     <Compile Include="ILogForm.cs" />
     <Compile Include="LogMessageEventArgs.cs" />
     <Compile Include="Models\CapabilityKey.cs" />

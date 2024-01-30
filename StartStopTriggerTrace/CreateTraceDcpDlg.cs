@@ -20,6 +20,8 @@ namespace StartStopTriggerTrace
 
         public List<Parameter> ParameterList { get; set; }
 
+        public string Subscriber { get; set; }
+
         public List<Event> EventList { get; set; }
 
 
@@ -34,6 +36,7 @@ namespace StartStopTriggerTrace
             lbParameters.DisplayMember = "DisplayName";
             traceId = new Random().Next(0, 10000).ToString();
             txtTraceDescription.Text = Equipment.Name + " Trace " + traceId;
+            txtSubscriber.Text = Subscriber;
         }
 
         public event EventHandler<LogMessageEventArgs> CreatedLogMessage;
@@ -71,13 +74,19 @@ namespace StartStopTriggerTrace
             this.Close();
         }
 
+        private void btnCreateDcp_XXXX(object sender, EventArgs e)
+        {
+            // var gemTraceDcp
+        }
+
+
         private async void btnCreateDcp_Click(object sender, EventArgs e)
         {
             var parameters = new List<Parameter>();
-            foreach (Parameter item in lbParameters.SelectedItems)
-            {
-                parameters.Add(item);
-            }
+            //foreach (Parameter item in lbParameters.SelectedItems)
+            //{
+            //    parameters.Add(item);
+            //}
             var startTriggers = new List<TriggerEventRequest>();
             foreach (TriggerEventRequest item in lbStartTriggers.Items)
             {
@@ -88,22 +97,21 @@ namespace StartStopTriggerTrace
             {
                 stopTriggers.Add(item);
             }
+
             var dcpInfo = new DcpInfo()
             {
-                DcpName = $"Trace DCP {traceId}",
+                DcpName = $"Event DCP {traceId}",
+                EventId = startTriggers[0].EventId,
                 Description = txtTraceDescription.Text,
-                Id = traceId,
-                RequestType = RequestType.Trace,
-                Interval = tbPeriod.Text,
-                CollectionCount = Convert.ToInt32(tbSamples.Text),
-                GroupSize = Convert.ToInt32(tbGroupSize.Text),
-                Equipment = Equipment,
+                Subscriber = txtSubscriber.Text,
                 Parameters = parameters,
-                StartTriggers = startTriggers.Count != 0 ? startTriggers : null,
-                StopTriggers = stopTriggers.Count != 0 ? stopTriggers : null
+                Id = traceId,
+                RequestType = RequestType.Event,
+                Equipment = Equipment
             };
+
             var response = await SapienceApiHandler.Instance.CreateDcpFromManager(dcpInfo);
-            RaiseCreatedLogMessage(response, "Create Trace DCP");
+            RaiseCreatedLogMessage(response, "Create Event DCP");
         }
 
         protected void RaiseCreatedLogMessage(HttpResponseMessage response, string operation)

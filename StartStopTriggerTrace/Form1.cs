@@ -40,7 +40,7 @@ namespace StartStopTriggerTrace
 
         private HttpListener listener;
 
-        private event EventHandler<String> DcpReceived;
+        private event EventHandler<string> DcpReceived;
 
         private bool running = true;
 
@@ -100,8 +100,6 @@ namespace StartStopTriggerTrace
             }
         }
 
-        private CreateTraceDcpDlg _createTraceDlg;
-
         private void btnCreateTraceDcp_Click(object sender, EventArgs e)
         {
             var equipmentConnection = (EquipmentConnectionListItem)cbEquipment.SelectedItem;
@@ -114,6 +112,7 @@ namespace StartStopTriggerTrace
                     Equipment = equipmentConnection.Equipment,
                     Text = $"Create Trace for {equipmentConnection.Equipment.Name}",
                     ParameterList = parameterList,
+                    Subscriber = SapienceApiHandler.Instance.EndpointURL,
                     EventList = eventList
                 };
             }
