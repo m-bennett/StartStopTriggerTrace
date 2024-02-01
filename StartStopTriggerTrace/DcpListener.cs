@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace StartStopTriggerTrace
 {
-    public class DcpListener
+    public class DcpListener : IDisposable
     {
-        private HttpListener listener;
+        private HttpListener _listener;
 
+        #region .NET events
         public class DcpReceivedEventArgs : EventArgs
         {
             public DcpReceivedEventArgs(EventReport report)
@@ -24,37 +25,56 @@ namespace StartStopTriggerTrace
         }
 
         public event EventHandler<DcpReceivedEventArgs> DcpReceived;
+        #endregion
 
-        private static DcpListener _dcpListener;
+        #region Singleton impementation
+        private static readonly Lazy<DcpListener> Lazy = new Lazy<DcpListener>(() => new DcpListener());
 
         public static DcpListener Instance
         {
-            get
-            {
-                if (_dcpListener == null)
-                    _dcpListener = new DcpListener();
-
-                return _dcpListener;
-            }
+            get => Lazy.Value;
         }
 
-        public DcpListener()
+        private DcpListener()
         {
-            Task.Run(StartHttpListener);
+        }
+        #endregion
+
+        public Task StartListening()
+        {
+            return Task.Run(() =>
+            {
+                if (_listener != null && _listener.IsListening)
+                    return;  // Already listening
+
+                StartHttpListener();
+            });
+        }
+
+        public void StopListening()
+        {
+            if (_listener != null)
+            {
+                if (_listener.IsListening)
+                    _listener.Stop();
+
+                _listener = null;
+            }
         }
 
         private void StartHttpListener()
         {
-            listener = new HttpListener();
-            listener.Prefixes.Add(SapienceApiHandler.Instance.EndpointURL);
+            _listener = new HttpListener();
+            _listener.Prefixes.Add(SapienceApiHandler.Instance.EndpointURL);
 
             try
             {
-                listener.Start();
+                _listener.Start();
 
-                while (true)
+                while (_listener != null &&
+                       _listener.IsListening)
                 {
-                    var context = listener.GetContext();
+                    var context = _listener.GetContext();
 
                     var request = context.Request;
                     var response = context.Response;
@@ -63,14 +83,12 @@ namespace StartStopTriggerTrace
                     response.StatusCode = (int)HttpStatusCode.OK;
                     response.Close();
 
-                    DcpReceived.Invoke(eventReport);
+                    DcpReceived?.Invoke(this, new DcpReceivedEventArgs(eventReport));
                 }
             }
             catch (Exception e)
             {
-                listener.Stop();
-                listener = null;
-
+                Dispose();
                 Console.WriteLine(e);
             }
         }
@@ -89,5 +107,33 @@ namespace StartStopTriggerTrace
                 }
             }
         }
+
+        #region IDispose implementation
+        private bool _disposed = false;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // Dispose managed resources
+
+                    StopListening();
+                    DcpReceived = null;
+                }
+
+                // Dispose unmanaged resources
+
+                _disposed = true;
+            }
+        }
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using StartStopTriggerTrace.Models;
+﻿using StartStopTriggerTrace.GEM_Trace_DCP;
+using StartStopTriggerTrace.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,6 +25,7 @@ namespace StartStopTriggerTrace
 
         public List<Event> EventList { get; set; }
 
+        public GemTraceDcpWithTriggers CreatedTrace { get; private set; } = null;
 
         public CreateTraceDcpDlg()
         {
@@ -35,7 +37,7 @@ namespace StartStopTriggerTrace
             lbParameters.DataSource = ParameterList;
             lbParameters.DisplayMember = "DisplayName";
             traceId = new Random().Next(0, 10000).ToString();
-            txtTraceDescription.Text = Equipment.Name + " Trace " + traceId;
+            txtTraceDescription.Text = Equipment.Name + " Trace";
             txtSubscriber.Text = Subscriber;
         }
 
@@ -74,44 +76,35 @@ namespace StartStopTriggerTrace
             this.Close();
         }
 
-        private void btnCreateDcp_XXXX(object sender, EventArgs e)
+        private void btnCreateDcp_Click(object sender, EventArgs e)
         {
-            // var gemTraceDcp
-        }
+            var triggers = new List<GemTraceDcpTrigger>();
 
+            // Start triggers
+            foreach (Event item in lbStartTriggers.Items)
+            {
+                triggers.Add(new GemTraceDcpTrigger(GemTraceDcpTrigger.TriggerTypes.Start,
+                                    item, Subscriber, Equipment));
+            }
 
-        private async void btnCreateDcp_Click(object sender, EventArgs e)
-        {
+            // Stop triggers
+            foreach (Event item in lbStopTriggers.Items)
+            {
+                triggers.Add(new GemTraceDcpTrigger(GemTraceDcpTrigger.TriggerTypes.Stop,
+                                    item, Subscriber, Equipment));
+            }
+
             var parameters = new List<Parameter>();
-            //foreach (Parameter item in lbParameters.SelectedItems)
-            //{
-            //    parameters.Add(item);
-            //}
-            var startTriggers = new List<TriggerEventRequest>();
-            foreach (TriggerEventRequest item in lbStartTriggers.Items)
+            foreach (Parameter item in lbParameters.SelectedItems)
             {
-                startTriggers.Add(item);
-            }
-            var stopTriggers = new List<TriggerEventRequest>();
-            foreach (TriggerEventRequest item in lbStopTriggers.Items)
-            {
-                stopTriggers.Add(item);
+                parameters.Add(item);
             }
 
-            var dcpInfo = new DcpInfo()
-            {
-                DcpName = $"Event DCP {traceId}",
-                EventId = startTriggers[0].EventId,
-                Description = txtTraceDescription.Text,
-                Subscriber = txtSubscriber.Text,
-                Parameters = parameters,
-                Id = traceId,
-                RequestType = RequestType.Event,
-                Equipment = Equipment
-            };
-
-            var response = await SapienceApiHandler.Instance.CreateDcpFromManager(dcpInfo);
-            RaiseCreatedLogMessage(response, "Create Event DCP");
+            CreatedTrace = new GemTraceDcpWithTriggers(Equipment, parameters, txtTraceDescription.Text,
+                                                triggers, tbPeriod.Text, Subscriber);
+            
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
         protected void RaiseCreatedLogMessage(HttpResponseMessage response, string operation)

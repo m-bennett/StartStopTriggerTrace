@@ -21,6 +21,7 @@ namespace StartStopTriggerTrace.Models
 	/// Equipment
 	/// </summary>
 	[DataContract]
+	[JsonObject(MemberSerialization.OptIn)]
 	public partial class Equipment : IEquatable<Equipment>, IValidatableObject
 	{
 		/// <summary>
@@ -51,6 +52,7 @@ namespace StartStopTriggerTrace.Models
 		/// Gets or Sets Id
 		/// </summary>
 		[DataMember(Name = "id", EmitDefaultValue = false)]
+		[JsonProperty]
 		public string Id { get; private set; }
 
 		/// <summary>
@@ -62,50 +64,44 @@ namespace StartStopTriggerTrace.Models
 		/// <summary>
 		/// Gets or Sets Description
 		/// </summary>
-		[DataMember(Name = "description", EmitDefaultValue = false)]
 		public string Description { get; set; }
 
 		/// <summary>
 		/// Gets or Sets EquipmentModel
 		/// </summary>
-		[DataMember(Name = "equipmentModel", EmitDefaultValue = false)]
 		public EquipmentEquipmentModel EquipmentModel { get; set; }
 
 		/// <summary>
 		/// Gets or Sets Group
 		/// </summary>
-		[DataMember(Name = "group", EmitDefaultValue = false)]
 		public EquipmentGroup Group { get; set; }
 
 		/// <summary>
 		/// The order of this equipment inside the associated group. Indices start with 1, so first equipment will have order 1, second equipment will have order 2, and so on. Order need not be consecutive, so a group may have only 2 equipments with order 3 and 7 respectively. However, the order needs to be unique inside the group.
 		/// </summary>
 		/// <value>The order of this equipment inside the associated group. Indices start with 1, so first equipment will have order 1, second equipment will have order 2, and so on. Order need not be consecutive, so a group may have only 2 equipments with order 3 and 7 respectively. However, the order needs to be unique inside the group.</value>
-		[DataMember(Name = "orderInGroup", EmitDefaultValue = false)]
 		public decimal? OrderInGroup { get; set; }
 
 		/// <summary>
 		/// Gets or Sets Connections
 		/// </summary>
 		[DataMember(Name = "connections", EmitDefaultValue = false)]
+		[JsonProperty]
 		public List<EquipmentConnection> Connections { get; set; }
 
 		/// <summary>
 		/// Gets or Sets Attributes
 		/// </summary>
-		[DataMember(Name = "attributes", EmitDefaultValue = false)]
 		public List<KeyValuePair> Attributes { get; set; }
 
 		/// <summary>
 		/// Gets or Sets SerialNumber
 		/// </summary>
-		[DataMember(Name = "serialNumber", EmitDefaultValue = false)]
 		public string SerialNumber { get; private set; }
 
 		/// <summary>
 		/// Gets or Sets Factory
 		/// </summary>
-		[DataMember(Name = "factory", EmitDefaultValue = false)]
 		public EquipmentFactory Factory { get; set; }
 
 		/// <summary>

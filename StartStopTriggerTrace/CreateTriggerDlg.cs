@@ -15,7 +15,7 @@ namespace StartStopTriggerTrace
     {
         public List<Event> CollectionEvents { get; set; }
 
-        public TriggerEventRequest TriggerResult { get; set; }
+        public Event TriggerResult { get; set; }
 
 
         public CreateTriggerDlg()
@@ -31,11 +31,7 @@ namespace StartStopTriggerTrace
 
         private void btnAddTrigger_Click(object sender, EventArgs e)
         {
-            TriggerResult = new TriggerEventRequest()
-            {
-                EventId = ((Event)lbEvents.SelectedItem).Id,
-                TriggerRequestType = "TriggerEventRequest",
-            };
+            TriggerResult = (Event)lbEvents.SelectedItem;
 
             DialogResult = DialogResult.OK;
             Close();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using StartStopTriggerTrace.Models;
 
 namespace StartStopTriggerTrace
@@ -17,6 +18,8 @@ namespace StartStopTriggerTrace
 
 		public string Name { get; set; }
 		public string Id { get; set; }
+
+		[JsonIgnore]
 		public TraceConditions.ParameterTypeEnum ParameterType { get; set; }
 		public string DisplayName
 		{

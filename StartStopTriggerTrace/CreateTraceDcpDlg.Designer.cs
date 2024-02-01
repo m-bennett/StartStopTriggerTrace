@@ -74,7 +74,7 @@
             this.txtTraceDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtTraceDescription.Location = new System.Drawing.Point(148, 15);
-            this.txtTraceDescription.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtTraceDescription.Margin = new System.Windows.Forms.Padding(4);
             this.txtTraceDescription.Name = "txtTraceDescription";
             this.txtTraceDescription.Size = new System.Drawing.Size(547, 22);
             this.txtTraceDescription.TabIndex = 1;
@@ -84,7 +84,7 @@
             this.txtFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtFilter.Location = new System.Drawing.Point(148, 47);
-            this.txtFilter.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtFilter.Margin = new System.Windows.Forms.Padding(4);
             this.txtFilter.Name = "txtFilter";
             this.txtFilter.Size = new System.Drawing.Size(547, 22);
             this.txtFilter.TabIndex = 3;
@@ -117,8 +117,9 @@
             this.lbParameters.FormattingEnabled = true;
             this.lbParameters.ItemHeight = 16;
             this.lbParameters.Location = new System.Drawing.Point(19, 113);
-            this.lbParameters.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lbParameters.Margin = new System.Windows.Forms.Padding(4);
             this.lbParameters.Name = "lbParameters";
+            this.lbParameters.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.lbParameters.Size = new System.Drawing.Size(676, 180);
             this.lbParameters.TabIndex = 5;
             // 
@@ -129,7 +130,7 @@
             this.lbStartTriggers.FormattingEnabled = true;
             this.lbStartTriggers.ItemHeight = 16;
             this.lbStartTriggers.Location = new System.Drawing.Point(3, 23);
-            this.lbStartTriggers.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lbStartTriggers.Margin = new System.Windows.Forms.Padding(4);
             this.lbStartTriggers.Name = "lbStartTriggers";
             this.lbStartTriggers.Size = new System.Drawing.Size(330, 148);
             this.lbStartTriggers.TabIndex = 7;
@@ -151,9 +152,9 @@
             this.lbStopTriggers.FormattingEnabled = true;
             this.lbStopTriggers.ItemHeight = 16;
             this.lbStopTriggers.Location = new System.Drawing.Point(5, 23);
-            this.lbStopTriggers.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.lbStopTriggers.Margin = new System.Windows.Forms.Padding(4);
             this.lbStopTriggers.Name = "lbStopTriggers";
-            this.lbStopTriggers.Size = new System.Drawing.Size(328, 148);
+            this.lbStopTriggers.Size = new System.Drawing.Size(327, 148);
             this.lbStopTriggers.TabIndex = 9;
             // 
             // label5
@@ -171,7 +172,7 @@
             this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainer1.Location = new System.Drawing.Point(15, 317);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -195,7 +196,7 @@
             // btnDeleteStartTrigger
             // 
             this.btnDeleteStartTrigger.Location = new System.Drawing.Point(168, 180);
-            this.btnDeleteStartTrigger.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnDeleteStartTrigger.Margin = new System.Windows.Forms.Padding(4);
             this.btnDeleteStartTrigger.Name = "btnDeleteStartTrigger";
             this.btnDeleteStartTrigger.Size = new System.Drawing.Size(152, 28);
             this.btnDeleteStartTrigger.TabIndex = 9;
@@ -206,7 +207,7 @@
             // btnCreateStartTrigger
             // 
             this.btnCreateStartTrigger.Location = new System.Drawing.Point(8, 181);
-            this.btnCreateStartTrigger.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnCreateStartTrigger.Margin = new System.Windows.Forms.Padding(4);
             this.btnCreateStartTrigger.Name = "btnCreateStartTrigger";
             this.btnCreateStartTrigger.Size = new System.Drawing.Size(152, 28);
             this.btnCreateStartTrigger.TabIndex = 8;
@@ -217,7 +218,7 @@
             // btnDeleteStopTrigger
             // 
             this.btnDeleteStopTrigger.Location = new System.Drawing.Point(165, 178);
-            this.btnDeleteStopTrigger.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnDeleteStopTrigger.Margin = new System.Windows.Forms.Padding(4);
             this.btnDeleteStopTrigger.Name = "btnDeleteStopTrigger";
             this.btnDeleteStopTrigger.Size = new System.Drawing.Size(152, 28);
             this.btnDeleteStopTrigger.TabIndex = 11;
@@ -228,7 +229,7 @@
             // btnCreateStopTrigger
             // 
             this.btnCreateStopTrigger.Location = new System.Drawing.Point(5, 180);
-            this.btnCreateStopTrigger.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnCreateStopTrigger.Margin = new System.Windows.Forms.Padding(4);
             this.btnCreateStopTrigger.Name = "btnCreateStopTrigger";
             this.btnCreateStopTrigger.Size = new System.Drawing.Size(152, 28);
             this.btnCreateStopTrigger.TabIndex = 10;
@@ -251,7 +252,7 @@
             // 
             this.tbPeriod.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.tbPeriod.Location = new System.Drawing.Point(101, 596);
-            this.tbPeriod.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tbPeriod.Margin = new System.Windows.Forms.Padding(4);
             this.tbPeriod.Name = "tbPeriod";
             this.tbPeriod.Size = new System.Drawing.Size(93, 22);
             this.tbPeriod.TabIndex = 12;
@@ -261,7 +262,7 @@
             // 
             this.tbSamples.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.tbSamples.Location = new System.Drawing.Point(304, 596);
-            this.tbSamples.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tbSamples.Margin = new System.Windows.Forms.Padding(4);
             this.tbSamples.Name = "tbSamples";
             this.tbSamples.Size = new System.Drawing.Size(93, 22);
             this.tbSamples.TabIndex = 14;
@@ -282,7 +283,7 @@
             // 
             this.tbGroupSize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.tbGroupSize.Location = new System.Drawing.Point(524, 596);
-            this.tbGroupSize.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tbGroupSize.Margin = new System.Windows.Forms.Padding(4);
             this.tbGroupSize.Name = "tbGroupSize";
             this.tbGroupSize.Size = new System.Drawing.Size(93, 22);
             this.tbGroupSize.TabIndex = 16;
@@ -303,7 +304,7 @@
             // 
             this.btnCreateDcp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCreateDcp.Location = new System.Drawing.Point(488, 638);
-            this.btnCreateDcp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnCreateDcp.Margin = new System.Windows.Forms.Padding(4);
             this.btnCreateDcp.Name = "btnCreateDcp";
             this.btnCreateDcp.Size = new System.Drawing.Size(100, 28);
             this.btnCreateDcp.TabIndex = 17;
@@ -315,7 +316,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.Location = new System.Drawing.Point(596, 638);
-            this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(4);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(100, 28);
             this.btnCancel.TabIndex = 18;
@@ -363,7 +364,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtTraceDescription);
             this.Controls.Add(this.label1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "CreateTraceDcpDlg";
             this.Text = "CreateTraceDlg";
             this.Load += new System.EventHandler(this.CreateTraceDlg_Load);
