@@ -83,14 +83,14 @@ namespace StartStopTriggerTrace
             // Start triggers
             foreach (Event item in lbStartTriggers.Items)
             {
-                triggers.Add(new GemTraceDcpTrigger(GemTraceDcpTrigger.TriggerTypes.Start,
+                triggers.Add(new GemTraceDcpTrigger(true,
                                     item, Subscriber, Equipment));
             }
 
             // Stop triggers
             foreach (Event item in lbStopTriggers.Items)
             {
-                triggers.Add(new GemTraceDcpTrigger(GemTraceDcpTrigger.TriggerTypes.Stop,
+                triggers.Add(new GemTraceDcpTrigger(false,
                                     item, Subscriber, Equipment));
             }
 
@@ -101,7 +101,7 @@ namespace StartStopTriggerTrace
             }
 
             CreatedTrace = new GemTraceDcpWithTriggers(Equipment, parameters, txtTraceDescription.Text,
-                                                triggers, tbPeriod.Text, Subscriber);
+                                                triggers, tbPeriod.Text);
             
             DialogResult = DialogResult.OK;
             Close();

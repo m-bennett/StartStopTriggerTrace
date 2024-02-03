@@ -27,22 +27,24 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
                                        IEnumerable<Parameter> parameters,
                                        string description,
                                        IEnumerable<GemTraceDcpTrigger> triggers,
-                                       string interval,
-                                       string subscriber)
+                                       string interval)
         {
             Equipment = equipment;
             Parameters = parameters.ToList();
             Description = description;
             Triggers = triggers.ToList();
             Interval = interval;
-            Subscriber = subscriber;
+
+            foreach (var trigger in Triggers)
+            {
+                trigger.TriggerReceived += Trigger_TriggerReceived;
+            }
         }
 
         public async Task Start()
         {
             foreach (var trigger in Triggers)
             {
-                trigger.TriggerReceived += Trigger_TriggerReceived;
                 var response = await trigger.CreateDcpFromManager();
                 var jsonString = await response.Content.ReadAsStringAsync();
             }
@@ -53,8 +55,7 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
             var trigger = (GemTraceDcpTrigger)sender;
             var description = $"Start Stop trigger app Trace DCP {Guid.NewGuid()}";
 
-            if (trigger.TriggerType == GemTraceDcpTrigger.TriggerTypes.Start &&
-                Status == DcpStatus.Stopped)
+            if (trigger.IsStartTrigger && Status == DcpStatus.Stopped)
             {
                 // Start trace
                 var dcpInfo = new DcpInfo()
@@ -66,7 +67,7 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
                     Interval = Interval,
                     CollectionCount = 0,
                     GroupSize = 1,
-                    Subscriber = Subscriber,
+                    Subscriber = "localhost",
                     Equipment = Equipment,
                     Parameters = Parameters
                 };
@@ -77,10 +78,8 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
 
             Status = DcpStatus.Started;
             }
-            else if (trigger.TriggerType == GemTraceDcpTrigger.TriggerTypes.Stop &&
-                Status == DcpStatus.Started)
+            else if (trigger.IsStartTrigger == false && Status == DcpStatus.Started)
             {
-
                 await SapienceApiHandler.Instance.DeleteDcp(TraceDcpId);
 
                 TraceDcpId = "";
@@ -99,9 +98,6 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
 
         [JsonProperty]
         public string Description { get; private set; }
-
-        [JsonProperty]
-        public string Subscriber { get; }
 
         private DcpStatus _status = DcpStatus.Stopped;
         public DcpStatus Status

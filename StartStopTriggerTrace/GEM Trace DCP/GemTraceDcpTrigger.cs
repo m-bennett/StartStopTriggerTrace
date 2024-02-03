@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using SapienceDcpManager.Models;
 using StartStopTriggerTrace.Models;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace StartStopTriggerTrace.GEM_Trace_DCP
@@ -13,22 +15,16 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
     {
         private DcpInfo _dcpInfo;
 
-        public enum TriggerTypes
-        {
-            Start,
-            Stop
-        }
-
-        public GemTraceDcpTrigger(TriggerTypes type, Event collectionEvent,
+        public GemTraceDcpTrigger(bool isStartTrigger, Event collectionEvent,
                                   string subscriber, Equipment equipment)
         {
             var parameters = new List<Parameter>();
-            TriggerType = type;
+            IsStartTrigger = isStartTrigger;
             CollectionEvent = collectionEvent;
             Subscriber = subscriber;
             Equipment = equipment;
 
-            var description = $"{type} trigger for GEM trace DCP. Event {collectionEvent.Id} - {collectionEvent.Name}.";
+            var description = $"{(isStartTrigger ? "Start" : "Stop")} trigger for GEM trace DCP. Event {collectionEvent.Id} - {collectionEvent.Name}.";
 
             DcpListener.Instance.DcpReceived += Listener_DcpReceived;
 
@@ -68,7 +64,8 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
             }
         }
 
-        public TriggerTypes TriggerType { get; }
+        [JsonProperty]
+        public bool IsStartTrigger { get; }
 
         public event EventHandler TriggerReceived;
     }

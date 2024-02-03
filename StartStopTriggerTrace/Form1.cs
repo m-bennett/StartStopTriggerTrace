@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace StartStopTriggerTrace
 {
@@ -22,16 +23,19 @@ namespace StartStopTriggerTrace
     {
         private List<Parameter> parameterList;
         private List<Event> eventList;
+        private readonly List<GemTraceDcpWithTriggers> traces = new List<GemTraceDcpWithTriggers>();
 
         public Form1()
         {
             InitializeComponent();
 
             var listener = DcpListener.Instance;
-            listener.DcpReceived += Listener_DcpReceived;
             listener.StartListening();
 
-            traces = JsonConvert.DeserializeObject<List<GemTraceDcpWithTriggers>>(File.ReadAllText("StartStopTriggerTraceDcpList.json"));
+            if (File.Exists("StartStopTriggerTraceDcpList.json"))
+            {
+                traces = JsonConvert.DeserializeObject<List<GemTraceDcpWithTriggers>>(File.ReadAllText("StartStopTriggerTraceDcpList.json"));
+            }
 
             lbDcps.DisplayMember = "Description";
 
@@ -41,27 +45,6 @@ namespace StartStopTriggerTrace
             parameterList = new List<Parameter>();
             eventList = new List<Event>();
         }
-
-        private void Listener_DcpReceived(object sender, DcpListener.DcpReceivedEventArgs e)
-        {
-        }
-
-        public string GetRequestPostData(HttpListenerRequest request)
-        {
-            if (!request.HasEntityBody)
-            {
-                return null;
-            }
-            using (System.IO.Stream body = request.InputStream) // here we have data
-            {
-                using (System.IO.StreamReader reader = new System.IO.StreamReader(body, request.ContentEncoding))
-                {
-                    return reader.ReadToEnd();
-                }
-            }
-        }
-
-        private List<GemTraceDcpWithTriggers> traces = new List<GemTraceDcpWithTriggers>();
 
         private async void btnCreateTraceDcp_Click(object sender, EventArgs e)
         {
@@ -84,13 +67,14 @@ namespace StartStopTriggerTrace
                 if (TraceDcpForm.ShowDialog(this) == DialogResult.OK)
                 {
                     var trace = ((CreateTraceDcpDlg)TraceDcpForm).CreatedTrace;
-
-                    lbDcps.DisplayMember = "Description";
                     lbDcps.Items.Add(trace);
                     traces.Add(trace);
 
-                    var json = JsonConvert.SerializeObject(traces, Newtonsoft.Json.Formatting.Indented,
-                               new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
+                    var json = JsonConvert.SerializeObject(traces, Formatting.Indented,
+                        new JsonSerializerSettings()
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        });
                     
                     File.WriteAllText($"StartStopTriggerTraceDcpList.json", json);
 
