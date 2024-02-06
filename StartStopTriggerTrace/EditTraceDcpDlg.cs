@@ -15,7 +15,7 @@ using System.Xml;
 
 namespace StartStopTriggerTrace
 {
-    public partial class CreateTraceDcpDlg : Form, ILogForm
+    public partial class EditTraceDcpDlg : Form, ILogForm
     {
         private string traceId;
         private List<Parameter> parameterList;
@@ -30,21 +30,27 @@ namespace StartStopTriggerTrace
 
         public List<Event> EventList { get; set; }
 
-        public GemTraceDcpWithTriggers CreatedTrace { get; private set; } = null;
+        public GemTraceDcpWithTriggers CreatedTrace { get; set; }
 
-        public CreateTraceDcpDlg()
+        public EditTraceDcpDlg()
         {
             InitializeComponent();
         }
 
-        private async void CreateTraceDlg_Load(object sender, EventArgs e)
+        private async void EditTraceDlg_Load(object sender, EventArgs e)
         {
+            lbStartTriggers.DisplayMember = "DisplayName";
+            lbStopTriggers.DisplayMember = "DisplayName";
+
             parameterList = new List<Parameter>();
             eventList = new List<Event>();
-            //traceId = new Random().Next(0, 10000).ToString();
             txtSubscriber.Text = Subscriber;
-            cbEquipment.DisplayMember = "Name";
-            await GetEquipment();
+            txtKafkaTopic.Text = CreatedTrace.KafkaTopic;
+            lblEquipment.Text = Equipment.Name;
+            txtTraceDescription.Text = CreatedTrace.Description;
+            lblIdValue.Text = CreatedTrace.Id;
+            btnCancel.Focus();
+            await PopulateFields();
         }
 
         public event EventHandler<LogMessageEventArgs> CreatedLogMessage;
@@ -120,17 +126,16 @@ namespace StartStopTriggerTrace
                 parameters.Add(item);
             }
 
-            var tid = Guid.NewGuid().ToString();
-            CreatedTrace = new GemTraceDcpWithTriggers(tid, Equipment, 
+            var tid = CreatedTrace.Id;
+            CreatedTrace = new GemTraceDcpWithTriggers(tid, Equipment,
                                                         parameters, txtKafkaTopic.Text,
-                                                        $"{txtTraceDescription.Text} {tid}",
+                                                        $"{txtTraceDescription.Text}",
                                                         triggers, tbPeriod.Text);
-
-            foreach(var t in CreatedTrace.Triggers)
+            foreach (var t in CreatedTrace.Triggers)
             {
                 t.AssociatedTraceGuid = CreatedTrace.Id;
             }
-            
+
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -160,47 +165,37 @@ namespace StartStopTriggerTrace
             lbStopTriggers.Items.Remove(lbStopTriggers.SelectedItem);
         }
 
-        private async Task GetEquipment()
+        //private async Task GetEquipment()
+        //{
+        //    var response = await SapienceApiHandler.Instance.GetEquipment();
+        //    if (response != null)
+        //    {
+        //        var jsonString = await response.Content.ReadAsStringAsync();
+        //        var equipment = JsonConvert.DeserializeObject<EquipmentResponse>(jsonString);
+
+        //        cbEquipment.Items.Clear();
+
+        //        foreach (Equipment eq in equipment.Content)
+        //        {
+        //            foreach (EquipmentConnection connection in eq.Connections)
+        //            {
+        //                var connectionType = (ConnectionTypeEnum)Enum.Parse(typeof(ConnectionTypeEnum), ConnectionType.ConnectionTypeMappings[connection.ConnectorDetail.CommunicationProtocol.Name], true);
+
+        //                if (connectionType == ConnectionTypeEnum.GEM)
+
+        //                    cbEquipment.Items.Add(eq);
+        //            }
+        //        }
+        //        cbEquipment.SelectedIndex = 0;
+        //        //cbEquipment_SelectedIndexChanged(cbEquipment, new EventArgs());
+
+        //    }
+        //}
+
+        private async Task PopulateFields()
         {
-            var response = await SapienceApiHandler.Instance.GetEquipment();
-            if (response != null)
-            {
-                var jsonString = await response.Content.ReadAsStringAsync();
-                var equipment = JsonConvert.DeserializeObject<EquipmentResponse>(jsonString);
-
-                cbEquipment.Items.Clear();
-
-                foreach (Equipment eq in equipment.Content)
-                {
-                    foreach (EquipmentConnection connection in eq.Connections)
-                    {
-                        var connectionType = (ConnectionTypeEnum)Enum.Parse(typeof(ConnectionTypeEnum), ConnectionType.ConnectionTypeMappings[connection.ConnectorDetail.CommunicationProtocol.Name], true);
-
-                        if(connectionType == ConnectionTypeEnum.GEM)
-
-                        cbEquipment.Items.Add(eq);
-                    }
-                }
-                cbEquipment.SelectedIndex = 0;
-                //cbEquipment_SelectedIndexChanged(cbEquipment, new EventArgs());
-
-            }
-        }
-
-        private async void cbEquipment_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var cb = (ComboBox)sender;
-            if (cb.SelectedItem == null)
-                return;
-
-            //btnCreateTraceDcp.Enabled = false;
-
             try
             {
-                lbStartTriggers.Items.Clear();
-                lbStopTriggers.Items.Clear();
-                Equipment = (Equipment)cb.SelectedItem;
-
                 var equipmentConnection = Equipment.Connections
                     .Find(x => (ConnectionTypeEnum)Enum.Parse(typeof(ConnectionTypeEnum),
                                x.ConnectorDetail.CommunicationProtocol.Name) == ConnectionTypeEnum.GEM);
@@ -208,8 +203,27 @@ namespace StartStopTriggerTrace
                 var configFileId = equipmentConnection.EquipmentConnectionTemplate.ConfigurationFile.Id;
 
                 await GetEquipmentInfosAsync(configFileId);
-                txtTraceDescription.Text = Equipment.Name + " Trace";
+                lbParameters.SelectedItems.Clear();
+                for (int i = 0; i < lbParameters.Items.Count; i++)
+                {
+                    var parm = (Parameter)lbParameters.Items[i];
+                    foreach(Parameter traceparameter in CreatedTrace.Parameters)
+                    {
+                        if(parm.Id == traceparameter.Id)
+                        {
+                            lbParameters.SetSelected(i, true);
+                            break;
+                        }
+                    }
+                }
 
+                foreach(GemTraceDcpTrigger tr in CreatedTrace.Triggers)
+                {
+                    if(tr.IsStartTrigger)
+                        lbStartTriggers.Items.Add(tr.CollectionEvent);
+                    else
+                        lbStopTriggers.Items.Add(tr.CollectionEvent);
+                }
 
                 //btnCreateTraceDcp.Enabled = true;
             }
@@ -233,7 +247,7 @@ namespace StartStopTriggerTrace
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xml.Result);
 
-                    ParseGemData(doc);
+                ParseGemData(doc);
 
                 lbParameters.DataSource = parameterList;
                 lbParameters.DisplayMember = "DisplayName";
@@ -299,8 +313,5 @@ namespace StartStopTriggerTrace
             }
             eventList = eventList.OrderBy(x => x.Name).ToList();
         }
-
-
-
     }
 }

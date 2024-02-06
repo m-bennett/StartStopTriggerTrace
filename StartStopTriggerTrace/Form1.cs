@@ -6,6 +6,7 @@ using StartStopTriggerTrace.GEM_Trace_DCP;
 using StartStopTriggerTrace.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,8 @@ namespace StartStopTriggerTrace
         private List<Parameter> parameterList;
         private List<Event> eventList;
         private readonly List<GemTraceDcpWithTriggers> traces = new List<GemTraceDcpWithTriggers>();
+        private string appkey = ConfigurationManager.AppSettings.Get("AppKey");
+
 
         public Form1()
         {
@@ -44,50 +47,62 @@ namespace StartStopTriggerTrace
 
             parameterList = new List<Parameter>();
             eventList = new List<Event>();
+
+            SyncWithServer();
         }
 
         private async void btnCreateTraceDcp_Click(object sender, EventArgs e)
         {
-            var equipmentConnection = (EquipmentConnectionListItem)cbEquipment.SelectedItem;
-
             ILogForm TraceDcpForm = null;
-            if (equipmentConnection.ConnectionType == ConnectionTypeEnum.GEM)
+            TraceDcpForm = new CreateTraceDcpDlg()
             {
-                TraceDcpForm = new CreateTraceDcpDlg()
-                {
-                    Equipment = equipmentConnection.Equipment,
-                    Text = $"Create Trace for {equipmentConnection.Equipment.Name}",
-                    ParameterList = parameterList,
-                    Subscriber = SapienceApiHandler.Instance.EndpointURL,
-                    EventList = eventList
-                };
+                Text = $"Create Trace",
+                ParameterList = parameterList,
+                Subscriber = SapienceApiHandler.Instance.EndpointURL,
+                EventList = eventList
+            };
 
-                TraceDcpForm.CreatedLogMessage += OnMessageLog;
+            TraceDcpForm.CreatedLogMessage += OnMessageLog;
 
-                if (TraceDcpForm.ShowDialog(this) == DialogResult.OK)
-                {
-                    var trace = ((CreateTraceDcpDlg)TraceDcpForm).CreatedTrace;
-                    lbDcps.Items.Add(trace);
-                    traces.Add(trace);
-
-                    var json = JsonConvert.SerializeObject(traces, Formatting.Indented,
-                        new JsonSerializerSettings()
-                        {
-                            NullValueHandling = NullValueHandling.Ignore
-                        });
-                    
-                    File.WriteAllText($"StartStopTriggerTraceDcpList.json", json);
-
-                    await trace.Start();
-                }
-            }
-            else
+            if (TraceDcpForm.ShowDialog(this) == DialogResult.OK)
             {
-                MessageBox.Show($"Connection type {equipmentConnection.ConnectionType} does not support Trace.");
-            }
+                var trace = ((CreateTraceDcpDlg)TraceDcpForm).CreatedTrace;
+                lbDcps.Items.Add(trace);
+                traces.Add(trace);
 
-            
+                var json = JsonConvert.SerializeObject(traces, Formatting.Indented,
+                    new JsonSerializerSettings()
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+
+                File.WriteAllText($"StartStopTriggerTraceDcpList.json", json);
+
+                await trace.Start();
+            }
         }
+
+        private async void SyncWithServer()
+        {
+            var response = await SapienceApiHandler.Instance.GetDcps(appkey);
+            if (response != null)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+
+                var dcpList = JsonConvert.DeserializeObject<DataCollectionPlanResponse>(jsonString);
+
+                foreach (var dcp in dcpList.Content)
+                {
+                    response = await SapienceApiHandler.Instance.DeleteDcp(dcp.Id);
+                }
+
+            }
+            foreach (GemTraceDcpWithTriggers trace in lbDcps.Items)
+            {
+                await trace.Start();
+            }
+        }
+
 
         private void OnMessageLog(object sender, LogMessageEventArgs e)
         {
@@ -111,181 +126,21 @@ namespace StartStopTriggerTrace
             tbLogs.AppendText(builder.ToString());
         }
 
-        private async Task GetEquipment()
-        {
-            var response = await SapienceApiHandler.Instance.GetEquipment();
-            if (response != null)
-            {
-                var jsonString = await response.Content.ReadAsStringAsync();
-                var equipment = JsonConvert.DeserializeObject<EquipmentResponse>(jsonString);
-
-                cbEquipment.Items.Clear();
-
-                foreach (Equipment eq in equipment.Content)
-                {
-                    foreach (EquipmentConnection connection in eq.Connections)
-                    {
-                        var connectionListItem = new EquipmentConnectionListItem()
-                        {
-                            Equipment = eq,
-                            ConnectionType = (ConnectionTypeEnum)Enum.Parse(typeof(ConnectionTypeEnum), ConnectionType.ConnectionTypeMappings[connection.ConnectorDetail.CommunicationProtocol.Name], true)
-                        };
-
-                        cbEquipment.Items.Add(connectionListItem);
-                        cbEquipment.SelectedIndex = 0;
-                    }
-                }
-            }
-        }
-
-        private async void Form1_Load(object sender, EventArgs e)
-        {
-            await GetEquipment();
-        }
-
-        private async void cbEquipment_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var cb = (ComboBox)sender;
-            if (cb.SelectedItem == null)
-                return;
-
-            btnCreateTraceDcp.Enabled = false;
-
-            try
-            {
-                var connection = (EquipmentConnectionListItem)cb.SelectedItem;
-
-                var equipmentConnection = connection.Equipment.Connections
-                    .Find(x => (ConnectionTypeEnum)Enum.Parse(typeof(ConnectionTypeEnum),
-                               x.ConnectorDetail.CommunicationProtocol.Name) == connection.ConnectionType);
-                
-                var configFileId = equipmentConnection.EquipmentConnectionTemplate.ConfigurationFile.Id;
-                
-                await GetEquipmentInfosAsync(configFileId, connection.ConnectionType);
-
-                eventList = eventList.OrderBy(x => x.Name).ToList();
-
-                // GetDcps();
-
-                btnCreateTraceDcp.Enabled = true;
-            }
-            catch (Exception ex)
-            {
-                tbLogs.PerformSafeOperation(() =>
-                {
-                    tbLogs.AppendText("Failed to load Equipment Config");
-                    tbLogs.AppendText("\r\n");
-                    tbLogs.AppendText(ex.ToString());
-                });
-            }
-        }
-
-        private async Task GetEquipmentInfosAsync(string configFileId, ConnectionTypeEnum connType)
-        {
-            var response = await SapienceApiHandler.Instance.GetConfigurationFile(configFileId);
-            if (response != null)
-            {
-                var xml = response.Content.ReadAsStringAsync();
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(xml.Result);
-
-                if (connType == ConnectionTypeEnum.EDA)
-                    ParseEdaData(doc);
-                else
-                    ParseGemData(doc);
-
-                parameterList = parameterList.OrderBy(x => x.Name).ToList();
-            }
-        }
-
-        private void ParseEdaData(XmlDocument doc)
-        {
-            var parameters = doc.SelectNodes("//*[@Type='Parameter']");
-            parameterList.Clear();
-            foreach (XmlElement parameter in parameters)
-            {
-                var name = parameter.GetAttribute("Name");
-                var sourceId = GetElementSourceId(parameter);
-                var param = new Parameter(name, $"{sourceId}:{name}");
-                parameterList.Add(param);
-            }
-
-            var events = doc.SelectNodes("//*[@Type='Event']");
-            eventList.Clear();
-            foreach (XmlElement cevent in events)
-            {
-                XmlElement sourceNode = (XmlElement)cevent.ParentNode.ParentNode;
-                var name = cevent.GetAttribute("Name");
-                var sourceId = GetElementSourceId(cevent);
-                sourceNode.GetAttribute("SourceID");
-                var ev = new Event(name, $"{sourceId}:{name}");
-                eventList.Add(ev);
-            }
-        }
-
-        private string GetElementSourceId(XmlElement element)
-        {
-            var parentNode = (XmlElement)element.ParentNode;
-            if (parentNode.HasAttribute("SourceID"))
-            {
-                return parentNode.GetAttribute("SourceID");
-            }
-            else
-            {
-                return GetElementSourceId(parentNode);
-            }
-        }
-
-        private void ParseGemData(XmlDocument doc)
-        {
-            parameterList.Clear();
-            eventList.Clear();
-
-            var variableLists = doc.SelectNodes("//VariableDescription");
-            foreach (XmlElement parameter in variableLists)
-            {
-                var name = parameter.SelectSingleNode("Name")?.InnerText;
-                var sourceId = parameter.SelectSingleNode("Id").InnerText;
-                var param = new Parameter(name, $"{sourceId}");
-                parameterList.Add(param);
-            }
-
-            var EcVariableLists = doc.SelectNodes("//EquipmentConstants");
-            foreach (XmlElement list in EcVariableLists)
-            {
-                var variableDescriptions = list.SelectNodes("//EquipmentConstantDefinition");
-                foreach (XmlElement parameter in variableDescriptions)
-                {
-                    var name = parameter.SelectSingleNode("Name")?.InnerText;
-                    var sourceId = parameter.SelectSingleNode("Id").InnerText;
-                    var param = new Parameter(name, $"{sourceId}");
-                    parameterList.Add(param);
-                }
-            }
-
-            var eventLists = doc.SelectNodes("//CollectionEvents");
-            foreach (XmlElement list in eventLists)
-            {
-                var eventDescription = list.SelectNodes("//CollectionEventDescription");
-                foreach (XmlElement ev in eventDescription)
-                {
-                    var name = ev.SelectSingleNode("Name")?.InnerText;
-                    var sourceId = ev.SelectSingleNode("Id").InnerText;
-                    var collectionEvent = new Event(name, $"{sourceId}");
-                    eventList.Add(collectionEvent);
-                }
-            }
-        }
 
         private async void btnDeleteDcp_Click(object sender, EventArgs e)
         {
             if (lbDcps.SelectedItem == null)
                 return;
 
-            var dcpId = ((DataCollectionPlan)lbDcps.SelectedItem).Id;
-            var response = await SapienceApiHandler.Instance.DeleteDcp(dcpId);
-            WriteToConsole(response, $"Delete DCP {dcpId}");
-            GetDcps();
+            var trace = (GemTraceDcpWithTriggers)lbDcps.SelectedItem;
+            traces.Remove(trace);
+            await trace.Delete();
+            lbDcps.Items.Remove(trace);
+
+            var json = JsonConvert.SerializeObject(traces, Formatting.Indented, 
+                new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
+
+            File.WriteAllText($"StartStopTriggerTraceDcpList.json", json);
         }
 
         private async void GetDcps()
@@ -306,6 +161,49 @@ namespace StartStopTriggerTrace
 
                 lbDcps.DisplayMember = "Name";
             }
+        }
+
+        private async void btnEditDcp_Click(object sender, EventArgs e)
+        {
+            if (lbDcps.SelectedItem == null)
+                return;
+
+            var trace = (GemTraceDcpWithTriggers)lbDcps.SelectedItem;
+            ILogForm EditTraceDcpForm = null;
+            EditTraceDcpForm = new EditTraceDcpDlg()
+            {
+                Text = $"Edit Trace",
+                Subscriber = SapienceApiHandler.Instance.EndpointURL,
+                Equipment = trace.Equipment,
+                CreatedTrace = trace
+                
+            };
+
+            EditTraceDcpForm.CreatedLogMessage += OnMessageLog;
+
+            if (EditTraceDcpForm.ShowDialog(this) == DialogResult.OK)
+            {
+                //Delete old trace
+                lbDcps.Items.Remove(trace);
+                await trace.Delete();
+                traces.Remove(trace);
+
+                //Add new trace
+                var newtrace = ((EditTraceDcpDlg)EditTraceDcpForm).CreatedTrace;
+                lbDcps.Items.Add(newtrace);
+                traces.Add(newtrace);
+
+                var json = JsonConvert.SerializeObject(traces, Formatting.Indented,
+                    new JsonSerializerSettings()
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+
+                File.WriteAllText($"StartStopTriggerTraceDcpList.json", json);
+
+                await newtrace.Start();
+            }
+
         }
     }
 }

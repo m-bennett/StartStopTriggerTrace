@@ -100,6 +100,12 @@
     <Compile Include="Client\IReadableConfiguration.cs" />
     <Compile Include="Client\SwaggerDateConverter.cs" />
     <Compile Include="ConnectionType.cs" />
+    <Compile Include="EditTraceDcpDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditTraceDcpDlg.Designer.cs">
+      <DependentUpon>EditTraceDcpDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="CreateTraceDcpDlg.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,6 +123,7 @@
     <Compile Include="EquipmentConnectionListItem.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="Extensions\ControlExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,6 +132,7 @@
     </Compile>
     <Compile Include="GEM Trace DCP\GemTraceDcpTrigger.cs" />
     <Compile Include="GEM Trace DCP\GemTraceDcpWithTriggers.cs" />
+    <Compile Include="GEM Trace DCP\TriggerInfo.cs" />
     <Compile Include="ILogForm.cs" />
     <Compile Include="LogMessageEventArgs.cs" />
     <Compile Include="Models\CapabilityKey.cs" />
@@ -171,6 +179,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SapienceApiHandler.cs" />
+    <EmbeddedResource Include="EditTraceDcpDlg.resx">
+      <DependentUpon>EditTraceDcpDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CreateTraceDcpDlg.resx">
       <DependentUpon>CreateTraceDcpDlg.cs</DependentUpon>
     </EmbeddedResource>

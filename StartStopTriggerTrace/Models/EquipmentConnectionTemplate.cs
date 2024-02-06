@@ -21,6 +21,7 @@ namespace StartStopTriggerTrace.Models
 	/// EquipmentConnectionTemplate
 	/// </summary>
 	[DataContract]
+	[JsonObject(MemberSerialization.OptIn)]
 	public partial class EquipmentConnectionTemplate : IEquatable<EquipmentConnectionTemplate>, IValidatableObject
 	{
 		/// <summary>
@@ -43,6 +44,7 @@ namespace StartStopTriggerTrace.Models
 		/// Gets or Sets Id
 		/// </summary>
 		[DataMember(Name = "id", EmitDefaultValue = false)]
+		[JsonProperty]
 		public string Id { get; private set; }
 
 		/// <summary>

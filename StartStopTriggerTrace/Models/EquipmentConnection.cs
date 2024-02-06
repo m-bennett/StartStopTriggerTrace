@@ -73,6 +73,7 @@ namespace StartStopTriggerTrace.Models
 		/// <summary>
 		/// Gets or Sets EquipmentConnectionTemplate
 		/// </summary>
+		[JsonProperty]
 		public EquipmentConnectionTemplate EquipmentConnectionTemplate { get; set; }
 
 		/// <summary>
