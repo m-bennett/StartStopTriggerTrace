@@ -75,7 +75,7 @@
             this.txtTraceDescription.Location = new System.Drawing.Point(148, 53);
             this.txtTraceDescription.Margin = new System.Windows.Forms.Padding(4);
             this.txtTraceDescription.Name = "txtTraceDescription";
-            this.txtTraceDescription.Size = new System.Drawing.Size(547, 22);
+            this.txtTraceDescription.Size = new System.Drawing.Size(505, 28);
             this.txtTraceDescription.TabIndex = 1;
             // 
             // txtFilter
@@ -85,7 +85,7 @@
             this.txtFilter.Location = new System.Drawing.Point(148, 83);
             this.txtFilter.Margin = new System.Windows.Forms.Padding(4);
             this.txtFilter.Name = "txtFilter";
-            this.txtFilter.Size = new System.Drawing.Size(547, 22);
+            this.txtFilter.Size = new System.Drawing.Size(505, 28);
             this.txtFilter.TabIndex = 3;
             // 
             // label2
@@ -109,7 +109,7 @@
             this.lbParameters.Margin = new System.Windows.Forms.Padding(4);
             this.lbParameters.Name = "lbParameters";
             this.lbParameters.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
-            this.lbParameters.Size = new System.Drawing.Size(676, 180);
+            this.lbParameters.Size = new System.Drawing.Size(666, 52);
             this.lbParameters.TabIndex = 5;
             // 
             // lbStartTriggers
@@ -121,7 +121,7 @@
             this.lbStartTriggers.Location = new System.Drawing.Point(3, 23);
             this.lbStartTriggers.Margin = new System.Windows.Forms.Padding(4);
             this.lbStartTriggers.Name = "lbStartTriggers";
-            this.lbStartTriggers.Size = new System.Drawing.Size(330, 148);
+            this.lbStartTriggers.Size = new System.Drawing.Size(326, 148);
             this.lbStartTriggers.TabIndex = 7;
             // 
             // label4
@@ -143,7 +143,7 @@
             this.lbStopTriggers.Location = new System.Drawing.Point(5, 23);
             this.lbStopTriggers.Margin = new System.Windows.Forms.Padding(4);
             this.lbStopTriggers.Name = "lbStopTriggers";
-            this.lbStopTriggers.Size = new System.Drawing.Size(324, 148);
+            this.lbStopTriggers.Size = new System.Drawing.Size(320, 148);
             this.lbStopTriggers.TabIndex = 9;
             // 
             // label5
@@ -160,7 +160,7 @@
             // 
             this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(15, 317);
+            this.splitContainer1.Location = new System.Drawing.Point(19, 225);
             this.splitContainer1.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainer1.Name = "splitContainer1";
             // 
@@ -177,8 +177,8 @@
             this.splitContainer1.Panel2.Controls.Add(this.btnCreateStopTrigger);
             this.splitContainer1.Panel2.Controls.Add(this.lbStopTriggers);
             this.splitContainer1.Panel2.Controls.Add(this.label5);
-            this.splitContainer1.Size = new System.Drawing.Size(683, 214);
-            this.splitContainer1.SplitterDistance = 338;
+            this.splitContainer1.Size = new System.Drawing.Size(675, 268);
+            this.splitContainer1.SplitterDistance = 334;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 10;
             // 
@@ -230,7 +230,7 @@
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(16, 580);
+            this.label6.Location = new System.Drawing.Point(20, 554);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(85, 17);
@@ -240,7 +240,7 @@
             // tbPeriod
             // 
             this.tbPeriod.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.tbPeriod.Location = new System.Drawing.Point(101, 576);
+            this.tbPeriod.Location = new System.Drawing.Point(126, 549);
             this.tbPeriod.Margin = new System.Windows.Forms.Padding(4);
             this.tbPeriod.Name = "tbPeriod";
             this.tbPeriod.Size = new System.Drawing.Size(93, 22);
@@ -250,7 +250,7 @@
             // btnCreateDcp
             // 
             this.btnCreateDcp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCreateDcp.Location = new System.Drawing.Point(488, 638);
+            this.btnCreateDcp.Location = new System.Drawing.Point(431, 626);
             this.btnCreateDcp.Margin = new System.Windows.Forms.Padding(4);
             this.btnCreateDcp.Name = "btnCreateDcp";
             this.btnCreateDcp.Size = new System.Drawing.Size(100, 28);
@@ -262,7 +262,7 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(596, 638);
+            this.btnCancel.Location = new System.Drawing.Point(566, 626);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(4);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(100, 28);
@@ -275,7 +275,7 @@
             // 
             this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(15, 548);
+            this.label9.Location = new System.Drawing.Point(19, 514);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(80, 17);
             this.label9.TabIndex = 19;
@@ -284,7 +284,7 @@
             // txtSubscriber
             // 
             this.txtSubscriber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.txtSubscriber.Location = new System.Drawing.Point(101, 545);
+            this.txtSubscriber.Location = new System.Drawing.Point(126, 510);
             this.txtSubscriber.Name = "txtSubscriber";
             this.txtSubscriber.Size = new System.Drawing.Size(594, 22);
             this.txtSubscriber.TabIndex = 20;
@@ -298,7 +298,7 @@
             this.cbEquipment.Location = new System.Drawing.Point(148, 21);
             this.cbEquipment.Margin = new System.Windows.Forms.Padding(4);
             this.cbEquipment.Name = "cbEquipment";
-            this.cbEquipment.Size = new System.Drawing.Size(547, 24);
+            this.cbEquipment.Size = new System.Drawing.Size(505, 24);
             this.cbEquipment.TabIndex = 22;
             this.cbEquipment.SelectedIndexChanged += new System.EventHandler(this.cbEquipment_SelectedIndexChanged);
             // 
@@ -315,7 +315,7 @@
             // txtKafkaTopic
             // 
             this.txtKafkaTopic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.txtKafkaTopic.Location = new System.Drawing.Point(297, 577);
+            this.txtKafkaTopic.Location = new System.Drawing.Point(371, 550);
             this.txtKafkaTopic.Margin = new System.Windows.Forms.Padding(4);
             this.txtKafkaTopic.Name = "txtKafkaTopic";
             this.txtKafkaTopic.Size = new System.Drawing.Size(398, 22);
@@ -326,7 +326,7 @@
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(202, 580);
+            this.label7.Location = new System.Drawing.Point(253, 554);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(87, 17);
@@ -337,7 +337,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(712, 681);
+            this.ClientSize = new System.Drawing.Size(569, 544);
             this.Controls.Add(this.txtKafkaTopic);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.cbEquipment);
