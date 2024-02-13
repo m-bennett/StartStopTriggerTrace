@@ -1,21 +1,13 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SapienceDcpManager.Models;
 using StartStopTriggerTrace.Extensions;
 using StartStopTriggerTrace.GEM_Trace_DCP;
 using StartStopTriggerTrace.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
+
 using Formatting = Newtonsoft.Json.Formatting;
 
 namespace StartStopTriggerTrace
@@ -26,18 +18,20 @@ namespace StartStopTriggerTrace
         private List<Event> eventList;
         private readonly List<GemTraceDcpWithTriggers> traces = new List<GemTraceDcpWithTriggers>();
         private string appkey = ConfigurationManager.AppSettings.Get("AppKey");
+        private string TraceDcpSaveFileName = "StartStopTriggerTraceDcpList.json";
+
 
 
         public Form1()
         {
             InitializeComponent();
 
-            var listener = DcpListener.Instance;
-            listener.StartListening();
+            Log.Instance.MessageLogged += MessageLogged;
 
-            if (File.Exists("StartStopTriggerTraceDcpList.json"))
+            if (File.Exists(TraceDcpSaveFileName))
             {
-                traces = JsonConvert.DeserializeObject<List<GemTraceDcpWithTriggers>>(File.ReadAllText("StartStopTriggerTraceDcpList.json"));
+                traces = JsonConvert.DeserializeObject<List<GemTraceDcpWithTriggers>>(File.ReadAllText(TraceDcpSaveFileName));
+                Log.Instance.WriteLog($"{traces.Count} Traces deserialized successfully.");
             }
 
             lbDcps.DisplayMember = "Description";
@@ -49,6 +43,13 @@ namespace StartStopTriggerTrace
             eventList = new List<Event>();
 
             SyncWithServer();
+
+        }
+
+
+        private void MessageLogged(string message)
+        {
+            tbLogs.PerformSafeOperation(() => tbLogs.AppendText(message));
         }
 
         private async void btnCreateTraceDcp_Click(object sender, EventArgs e)
@@ -57,12 +58,10 @@ namespace StartStopTriggerTrace
             TraceDcpForm = new CreateTraceDcpDlg()
             {
                 Text = $"Create Trace",
-                ParameterList = parameterList,
+                // ParameterList = parameterList,
                 Subscriber = SapienceApiHandler.Instance.EndpointURL,
                 EventList = eventList
             };
-
-            TraceDcpForm.CreatedLogMessage += OnMessageLog;
 
             if (TraceDcpForm.ShowDialog(this) == DialogResult.OK)
             {
@@ -76,7 +75,7 @@ namespace StartStopTriggerTrace
                         NullValueHandling = NullValueHandling.Ignore
                     });
 
-                File.WriteAllText($"StartStopTriggerTraceDcpList.json", json);
+                SaveTraces(json);
 
                 await trace.Start();
             }
@@ -85,7 +84,7 @@ namespace StartStopTriggerTrace
         private async void SyncWithServer()
         {
             var response = await SapienceApiHandler.Instance.GetDcps(appkey);
-            if (response != null)
+            if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
 
@@ -103,30 +102,6 @@ namespace StartStopTriggerTrace
             }
         }
 
-
-        private void OnMessageLog(object sender, LogMessageEventArgs e)
-        {
-            WriteToConsole(e.Resposne, e.Operation);
-        }
-
-        private void WriteToConsole(HttpResponseMessage response, string operation = "")
-        {
-            var result = response.Content.ReadAsStringAsync().Result;
-            try
-            {
-                result = JValue.Parse(result).ToString(Newtonsoft.Json.Formatting.Indented);
-            }
-            catch (Newtonsoft.Json.JsonReaderException) { }
-
-            var builder = new StringBuilder();
-            builder.AppendLine();
-            builder.AppendLine($"=========={operation}==============");
-            builder.AppendLine($"HTTP code: {(int)response.StatusCode} {response.StatusCode} ");
-            builder.AppendLine(result);
-            tbLogs.AppendText(builder.ToString());
-        }
-
-
         private async void btnDeleteDcp_Click(object sender, EventArgs e)
         {
             if (lbDcps.SelectedItem == null)
@@ -137,30 +112,10 @@ namespace StartStopTriggerTrace
             await trace.Delete();
             lbDcps.Items.Remove(trace);
 
-            var json = JsonConvert.SerializeObject(traces, Formatting.Indented, 
+            var json = JsonConvert.SerializeObject(traces, Formatting.Indented,
                 new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
 
-            File.WriteAllText($"StartStopTriggerTraceDcpList.json", json);
-        }
-
-        private async void GetDcps()
-        {
-            lbDcps.Items.Clear();
-
-            var response = await SapienceApiHandler.Instance.GetDcps(null);
-            if (response != null)
-            {
-                var jsonString = await response.Content.ReadAsStringAsync();
-
-                var dcpList = JsonConvert.DeserializeObject<DataCollectionPlanResponse>(jsonString);
-
-                foreach (DataCollectionPlan dcp in dcpList.Content)
-                {
-                    lbDcps.Items.Add(dcp);
-                }
-
-                lbDcps.DisplayMember = "Name";
-            }
+            SaveTraces(json);
         }
 
         private async void btnEditDcp_Click(object sender, EventArgs e)
@@ -176,10 +131,8 @@ namespace StartStopTriggerTrace
                 Subscriber = SapienceApiHandler.Instance.EndpointURL,
                 Equipment = trace.Equipment,
                 CreatedTrace = trace
-                
-            };
 
-            EditTraceDcpForm.CreatedLogMessage += OnMessageLog;
+            };
 
             if (EditTraceDcpForm.ShowDialog(this) == DialogResult.OK)
             {
@@ -199,11 +152,22 @@ namespace StartStopTriggerTrace
                         NullValueHandling = NullValueHandling.Ignore
                     });
 
-                File.WriteAllText($"StartStopTriggerTraceDcpList.json", json);
+                SaveTraces(json);
 
                 await newtrace.Start();
             }
 
+        }
+
+        private void SaveTraces(string json)
+        {
+            File.WriteAllText(TraceDcpSaveFileName, json);
+            Log.Instance.WriteLog("Traces serialized successfully.");
+        }
+
+        private void btnClearLogs_Click(object sender, EventArgs e)
+        {
+            tbLogs.Clear();
         }
     }
 }

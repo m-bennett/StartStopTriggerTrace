@@ -1,30 +1,23 @@
-﻿using Newtonsoft.Json;
-using StartStopTriggerTrace.GEM_Trace_DCP;
+﻿using StartStopTriggerTrace.GEM_Trace_DCP;
 using StartStopTriggerTrace.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 
 namespace StartStopTriggerTrace
 {
     public partial class EditTraceDcpDlg : Form, ILogForm
     {
-        private string traceId;
-        private List<Parameter> parameterList;
-        private List<Event> eventList;
-
+        private GemHelper.DataLists _data;
 
         public Equipment Equipment { get; set; }
 
-        public List<Parameter> ParameterList { get; set; }
+        private List<Parameter> _selectedParameters = new List<Parameter>();
+        private bool _filteringParameters = false;
+
+        // public List<Parameter> ParameterList { get; set; }
 
         public string Subscriber { get; set; }
 
@@ -42,12 +35,9 @@ namespace StartStopTriggerTrace
             lbStartTriggers.DisplayMember = "DisplayName";
             lbStopTriggers.DisplayMember = "DisplayName";
 
-            parameterList = new List<Parameter>();
-            eventList = new List<Event>();
-            txtSubscriber.Text = Subscriber;
             txtKafkaTopic.Text = CreatedTrace.KafkaTopic;
             lblEquipment.Text = Equipment.Name;
-            txtTraceDescription.Text = CreatedTrace.Description;
+            txtTraceDescription.Text = CreatedTrace.Description.Replace($" {CreatedTrace.Id}", String.Empty);
             lblIdValue.Text = CreatedTrace.Id;
             btnCancel.Focus();
             await PopulateFields();
@@ -59,7 +49,7 @@ namespace StartStopTriggerTrace
         {
             var createTriggerDlg = new CreateTriggerDlg()
             {
-                CollectionEvents = eventList
+                CollectionEvents = _data.EventList
             };
 
             if (createTriggerDlg.ShowDialog(this) == DialogResult.OK)
@@ -73,7 +63,7 @@ namespace StartStopTriggerTrace
         {
             var createTriggerDlg = new CreateTriggerDlg()
             {
-                CollectionEvents = eventList,
+                CollectionEvents = _data.EventList
             };
 
             if (createTriggerDlg.ShowDialog(this) == DialogResult.OK)
@@ -120,16 +110,10 @@ namespace StartStopTriggerTrace
                 triggers.Add(new GemTraceDcpTrigger(triggerinfo));
             }
 
-            var parameters = new List<Parameter>();
-            foreach (Parameter item in lbParameters.SelectedItems)
-            {
-                parameters.Add(item);
-            }
-
             var tid = CreatedTrace.Id;
             CreatedTrace = new GemTraceDcpWithTriggers(tid, Equipment,
-                                                        parameters, txtKafkaTopic.Text,
-                                                        $"{txtTraceDescription.Text}",
+                                                        _selectedParameters, txtKafkaTopic.Text,
+                                                        $"{txtTraceDescription.Text} {CreatedTrace.Id}",
                                                         triggers, tbPeriod.Text);
             foreach (var t in CreatedTrace.Triggers)
             {
@@ -165,33 +149,6 @@ namespace StartStopTriggerTrace
             lbStopTriggers.Items.Remove(lbStopTriggers.SelectedItem);
         }
 
-        //private async Task GetEquipment()
-        //{
-        //    var response = await SapienceApiHandler.Instance.GetEquipment();
-        //    if (response != null)
-        //    {
-        //        var jsonString = await response.Content.ReadAsStringAsync();
-        //        var equipment = JsonConvert.DeserializeObject<EquipmentResponse>(jsonString);
-
-        //        cbEquipment.Items.Clear();
-
-        //        foreach (Equipment eq in equipment.Content)
-        //        {
-        //            foreach (EquipmentConnection connection in eq.Connections)
-        //            {
-        //                var connectionType = (ConnectionTypeEnum)Enum.Parse(typeof(ConnectionTypeEnum), ConnectionType.ConnectionTypeMappings[connection.ConnectorDetail.CommunicationProtocol.Name], true);
-
-        //                if (connectionType == ConnectionTypeEnum.GEM)
-
-        //                    cbEquipment.Items.Add(eq);
-        //            }
-        //        }
-        //        cbEquipment.SelectedIndex = 0;
-        //        //cbEquipment_SelectedIndexChanged(cbEquipment, new EventArgs());
-
-        //    }
-        //}
-
         private async Task PopulateFields()
         {
             try
@@ -202,116 +159,114 @@ namespace StartStopTriggerTrace
 
                 var configFileId = equipmentConnection.EquipmentConnectionTemplate.ConfigurationFile.Id;
 
-                await GetEquipmentInfosAsync(configFileId);
-                lbParameters.SelectedItems.Clear();
-                for (int i = 0; i < lbParameters.Items.Count; i++)
+                _data = await GemHelper.GetEquipmentInfosAsync(configFileId);
+                if (_data != null)
                 {
-                    var parm = (Parameter)lbParameters.Items[i];
-                    foreach(Parameter traceparameter in CreatedTrace.Parameters)
+                    lbParameters.BeginUpdate();
+
+                    foreach (Parameter item in _data.ParameterList)
+                        lbParameters.Items.Add(item);
+
+                    lbParameters.DisplayMember = "DisplayName";
+
+                    lbParameters.SelectedItems.Clear();
+                    for (int i = 0; i < lbParameters.Items.Count; i++)
                     {
-                        if(parm.Id == traceparameter.Id)
+                        var parm = (Parameter)lbParameters.Items[i];
+                        foreach (Parameter traceparameter in CreatedTrace.Parameters)
                         {
-                            lbParameters.SetSelected(i, true);
-                            break;
+                            if (parm.Id == traceparameter.Id)
+                            {
+                                lbParameters.SetSelected(i, true);
+                                break;
+                            }
                         }
                     }
-                }
 
-                foreach(GemTraceDcpTrigger tr in CreatedTrace.Triggers)
+                    lbParameters.EndUpdate();
+
+                    foreach (GemTraceDcpTrigger tr in CreatedTrace.Triggers)
+                    {
+                        if (tr.IsStartTrigger)
+                            lbStartTriggers.Items.Add(tr.CollectionEvent);
+                        else
+                            lbStopTriggers.Items.Add(tr.CollectionEvent);
+                    }
+
+                    Log.Instance.WriteLog("Equipment data retrieved successfully.");
+                }
+                else
                 {
-                    if(tr.IsStartTrigger)
-                        lbStartTriggers.Items.Add(tr.CollectionEvent);
-                    else
-                        lbStopTriggers.Items.Add(tr.CollectionEvent);
+                    Log.Instance.WriteLog("Error retrieving equipment data.");
                 }
 
-                //btnCreateTraceDcp.Enabled = true;
+
             }
             catch (Exception ex)
             {
-                //tbLogs.PerformSafeOperation(() =>
-                //{
-                //    tbLogs.AppendText("Failed to load Equipment Config");
-                //    tbLogs.AppendText("\r\n");
-                //    tbLogs.AppendText(ex.ToString());
-                //});
+                Log.Instance.WriteLog($"PopulateField() error editing trace {CreatedTrace.Id}. {ex.Message}");
             }
         }
 
-        private async Task GetEquipmentInfosAsync(string configFileId)
+        private void btnApplyFilter_Click(object sender, EventArgs e)
         {
-            var response = await SapienceApiHandler.Instance.GetConfigurationFile(configFileId);
-            if (response != null)
-            {
-                var xml = response.Content.ReadAsStringAsync();
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(xml.Result);
+            lbParameters.BeginUpdate();
+            _filteringParameters = true;
 
-                ParseGemData(doc);
+            lbParameters.Items.Clear();
 
-                lbParameters.DataSource = parameterList;
-                lbParameters.DisplayMember = "DisplayName";
-            }
-        }
-        private string GetElementSourceId(XmlElement element)
-        {
-            var parentNode = (XmlElement)element.ParentNode;
-            if (parentNode.HasAttribute("SourceID"))
+            if (string.IsNullOrWhiteSpace(txtFilter.Text))
             {
-                return parentNode.GetAttribute("SourceID");
+                // Display all parameters.
+                foreach (Parameter item in _data.ParameterList)
+                    lbParameters.Items.Add(item);
             }
             else
             {
-                return GetElementSourceId(parentNode);
+                // Display parameters that match the filter.
+                var filter = txtFilter.Text.ToUpper();
+
+                foreach (Parameter item in _data.ParameterList)
+                {
+                    if (item.DisplayName.ToUpper().Contains(filter))
+                        lbParameters.Items.Add(item);
+                }
             }
+
+            for (int idx = 0; idx < lbParameters.Items.Count; ++idx)
+            {
+                if (_selectedParameters.Contains((Parameter)lbParameters.Items[idx]))
+                    lbParameters.SetSelected(idx, true);
+            }
+
+            _filteringParameters = false;
+            lbParameters.EndUpdate();
         }
 
-        private void ParseGemData(XmlDocument doc)
+        private void lbParameters_SelectedIndexChanged(object sender, EventArgs e)
         {
-            parameterList.Clear();
-            eventList.Clear();
+            if (_filteringParameters)
+                return;
 
-            var StatusVariableList = doc.SelectNodes("//StatusVariables");
-            foreach (XmlElement list in StatusVariableList)
+            for (int idx = 0; idx < lbParameters.Items.Count; ++idx)
             {
-                var variableLists = list.ChildNodes;
-                foreach (XmlElement parameter in variableLists)
+                if (lbParameters.SelectedIndices.Contains(idx))
                 {
-                    var name = parameter.SelectSingleNode("Name")?.InnerText;
-                    var sourceId = parameter.SelectSingleNode("Id").InnerText;
-                    var param = new Parameter(name, $"{sourceId}");
-                    parameterList.Add(param);
+                    // Parameter is selected. Make sure tht it is in _selectedParameters.
+
+                    var item = (Parameter)lbParameters.Items[idx];
+
+                    if (_selectedParameters.Contains(item) == false)
+                        _selectedParameters.Add(item);
+                }
+                else
+                {
+                    // Parameter is not selected. Make sure that it is not in _selectedParameters.
+
+                    var item = (Parameter)lbParameters.Items[idx];
+                    _selectedParameters.Remove(item);
                 }
             }
-
-            var EcVariableLists = doc.SelectNodes("//EquipmentConstants");
-            foreach (XmlElement list in EcVariableLists)
-            {
-                var variableDescriptions = list.SelectNodes("//EquipmentConstantDefinition");
-                foreach (XmlElement parameter in variableDescriptions)
-                {
-                    var name = parameter.SelectSingleNode("Name")?.InnerText;
-                    var sourceId = parameter.SelectSingleNode("Id").InnerText;
-                    var param = new Parameter(name, $"{sourceId}");
-                    parameterList.Add(param);
-                }
-            }
-            parameterList = parameterList.OrderBy(x => x.Name).ToList();
-
-
-            var eventLists = doc.SelectNodes("//CollectionEvents");
-            foreach (XmlElement list in eventLists)
-            {
-                var eventDescription = list.SelectNodes("//CollectionEventDescription");
-                foreach (XmlElement ev in eventDescription)
-                {
-                    var name = ev.SelectSingleNode("Name")?.InnerText;
-                    var sourceId = ev.SelectSingleNode("Id").InnerText;
-                    var collectionEvent = new Event(name, $"{sourceId}");
-                    eventList.Add(collectionEvent);
-                }
-            }
-            eventList = eventList.OrderBy(x => x.Name).ToList();
         }
     }
 }

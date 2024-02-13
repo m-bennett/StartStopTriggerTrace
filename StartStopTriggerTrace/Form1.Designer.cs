@@ -35,6 +35,7 @@
             this.btnDeleteDcp = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.tbLogs = new System.Windows.Forms.TextBox();
+            this.btnClearLogs = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lbDcps
@@ -42,6 +43,7 @@
             this.lbDcps.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbDcps.FormattingEnabled = true;
+            this.lbDcps.HorizontalScrollbar = true;
             this.lbDcps.ItemHeight = 16;
             this.lbDcps.Location = new System.Drawing.Point(16, 36);
             this.lbDcps.Margin = new System.Windows.Forms.Padding(4);
@@ -114,14 +116,28 @@
             this.tbLogs.Margin = new System.Windows.Forms.Padding(4);
             this.tbLogs.Multiline = true;
             this.tbLogs.Name = "tbLogs";
-            this.tbLogs.Size = new System.Drawing.Size(649, 249);
+            this.tbLogs.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbLogs.Size = new System.Drawing.Size(649, 218);
             this.tbLogs.TabIndex = 9;
+            // 
+            // btnClearLogs
+            // 
+            this.btnClearLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClearLogs.Location = new System.Drawing.Point(565, 674);
+            this.btnClearLogs.Margin = new System.Windows.Forms.Padding(4);
+            this.btnClearLogs.Name = "btnClearLogs";
+            this.btnClearLogs.Size = new System.Drawing.Size(100, 28);
+            this.btnClearLogs.TabIndex = 10;
+            this.btnClearLogs.Text = "Clear";
+            this.btnClearLogs.UseVisualStyleBackColor = true;
+            this.btnClearLogs.Click += new System.EventHandler(this.btnClearLogs_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(683, 713);
+            this.Controls.Add(this.btnClearLogs);
             this.Controls.Add(this.tbLogs);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.btnDeleteDcp);
@@ -145,6 +161,7 @@
         private System.Windows.Forms.Button btnDeleteDcp;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tbLogs;
+        private System.Windows.Forms.Button btnClearLogs;
     }
 }
 

@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using StartStopTriggerTrace.Extensions;
+using System.Configuration;
 
 namespace StartStopTriggerTrace.GEM_Trace_DCP
 {
@@ -15,10 +17,11 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
     public class GemTraceDcpTrigger
     {
         private DcpInfo _dcpInfo;
+        private string _dcpId;
+        private KafkaConsumer _consumer = new KafkaConsumer();
 
         public GemTraceDcpTrigger()
         {
-            DcpListener.Instance.DcpReceived += Listener_DcpReceived;
         }
         public GemTraceDcpTrigger(TriggerInfo ti)
         {
@@ -29,17 +32,22 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
             KafkaTopic = ti.KafkaTopic;
             Equipment = ti.Equipment;
 
-            DcpListener.Instance.DcpReceived += Listener_DcpReceived;
             _dcpInfo = new DcpInfo();
-
         }
 
         public async Task<HttpResponseMessage> CreateDcpFromManager()
         {
+            _consumer.DcpReceived += Listener_DcpReceived;
+            _consumer.KafkaServer = ConfigurationManager.AppSettings.Get("KafkaServer");
+
+            var guid = Guid.NewGuid().ToString();
+            _consumer.GroupId = guid;
+            _consumer.Topic = KafkaTopic;
+
             var parameters = new List<Parameter>();
             _dcpInfo = new DcpInfo();
 
-            _dcpInfo.DcpName = $"{(IsStartTrigger ? "Start" : "Stop")}TriggerEvent_EventId_{CollectionEvent.Id}_{Guid.NewGuid()}";
+            _dcpInfo.DcpName = $"{(IsStartTrigger ? "Start" : "Stop")}TriggerEvent_EventId_{CollectionEvent.Id}_{guid}";
             _dcpInfo.EventId = CollectionEvent.Id;
             _dcpInfo.Description = Description;
             _dcpInfo.Subscriber = Subscriber;
@@ -49,6 +57,14 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
             _dcpInfo.Equipment = Equipment;
 
             var response = await SapienceApiHandler.Instance.CreateDcpFromManager(_dcpInfo);
+            _dcpInfo.Id = await GemHelper.CheckStatusAndGetDcpId(response);
+            if (String.IsNullOrEmpty(_dcpInfo.Id))
+                Log.Instance.WriteLog($"Error creating Sapience DCP for {CollectionEvent.Id}. {response.Content.ReadAsStringAsync()}");
+            else
+                Log.Instance.WriteLog($"Sapience DCP {_dcpInfo.Id} created successfully for event ID = {_dcpInfo.EventId}.");
+
+            _consumer.DcpInfo = _dcpInfo;
+            _consumer.StartListening();
 
             return response;
         }
@@ -61,7 +77,6 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
             set
             {
                 _associatedTraceGuid = value;
-                //_dcpInfo.Description = Description;
             }
         }
 
@@ -83,7 +98,8 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
 
         internal void Delete()
         {
-            DcpListener.Instance.DcpReceived -= Listener_DcpReceived;
+            _consumer.StopListening();
+            _consumer.DcpReceived -= Listener_DcpReceived;
         }
 
         [JsonProperty]
@@ -98,11 +114,12 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
         [JsonProperty]
         public Equipment Equipment { get; set; }
 
-        private void Listener_DcpReceived(object sender, DcpListener.DcpReceivedEventArgs e)
+        private void Listener_DcpReceived(object sender, KafkaConsumer.DcpReceivedEventArgs e)
         {
             if (e.Report.drsreport.report.eventId == CollectionEvent.Id)
             {
                 TriggerReceived?.Invoke(this, EventArgs.Empty);
+                Log.Instance.WriteLog($"{(IsStartTrigger ? "Start" : "Stop")} trigger event Id = {CollectionEvent.Id} received.");
             }
         }
 

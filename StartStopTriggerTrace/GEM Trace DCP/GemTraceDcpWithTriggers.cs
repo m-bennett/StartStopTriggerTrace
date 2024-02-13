@@ -47,19 +47,22 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
             }
         }
 
-        public async Task Start()
+        public async Task<List<HttpResponseMessage>> Start()
         {
+            var responses = new List<HttpResponseMessage>();
+
             foreach (var trigger in Triggers)
             {
-                var response = await trigger.CreateDcpFromManager();
-                var jsonString = await response.Content.ReadAsStringAsync();
+                responses.Add(await trigger.CreateDcpFromManager());
             }
+
+            return responses;
         }
 
         public async Task Delete()
         {
             var response = await SapienceApiHandler.Instance.GetDcps(appkey);
-            if (response != null)
+            if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
 
@@ -70,10 +73,18 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
                     if (dcp.Description.Contains(Id))
                     {
                         response = await SapienceApiHandler.Instance.DeleteDcp(dcp.Id);
+                        if (response.IsSuccessStatusCode)
+                            Log.Instance.WriteLog($"Succesfully deleted Sapience DCP {dcp.Id}");
+                        else
+                            Log.Instance.WriteLog($"Unable to delete Sapience DCP {dcp.Id}. {response.Content.ReadAsStringAsync()}");
                     }
                 }
             }
-            foreach(var trigger in Triggers)
+            else
+            {
+                Log.Instance.WriteLog($"Request to Get Sapience DCPs failed. {response.Content.ReadAsStringAsync()}");
+            }
+            foreach (var trigger in Triggers)
             {
                 trigger.TriggerReceived -= Trigger_TriggerReceived;
                 trigger.Delete();
@@ -86,49 +97,57 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
         {
             var trigger = (GemTraceDcpTrigger)sender;
 
-            if (trigger.IsStartTrigger && Status == DcpStatus.Stopped)
+            try
             {
-                var description = $"StartStopTriggerApp_Trace_DCP_{Id}";
-                // Start trace
-                var dcpInfo = new DcpInfo()
+                if (trigger.IsStartTrigger && Status == DcpStatus.Stopped)
                 {
-                    DcpName = description,
-                    Description = description,
-                    Id = Id,
-                    RequestType = RequestType.Trace,
-                    Interval = Interval,
-                    CollectionCount = 0,
-                    GroupSize = 1,
-                    Subscriber = "localhost",
-                    KafkaTopic = KafkaTopic,
-                    Equipment = Equipment,
-                    Parameters = Parameters
-                };
+                    var description = $"StartStopTriggerApp_Trace_DCP_{Id}";
+                    // Start trace
+                    var dcpInfo = new DcpInfo()
+                    {
+                        DcpName = description,
+                        Description = description,
+                        Id = Id,
+                        RequestType = RequestType.Trace,
+                        Interval = Interval,
+                        CollectionCount = 0,
+                        GroupSize = 1,
+                        Subscriber = "localhost",
+                        KafkaTopic = KafkaTopic,
+                        Equipment = Equipment,
+                        Parameters = Parameters
+                    };
 
-                var response = await SapienceApiHandler.Instance.CreateDcpFromManager(dcpInfo);
-                if (!response.IsSuccessStatusCode)
-                    return;
-                var jsonString = await response.Content.ReadAsStringAsync();
-                TraceDcpId = JsonConvert.DeserializeObject<CreateResponse>(jsonString).Id;
+                    var response = await SapienceApiHandler.Instance.CreateDcpFromManager(dcpInfo);
+                    SapienceTraceDcpId = await GemHelper.CheckStatusAndGetDcpId(response);
 
-                Status = DcpStatus.Started;
+                    Status = DcpStatus.Started;
+                    Log.Instance.WriteLog($"Trace ID = {Id} started.");
+                }
+                else if (trigger.IsStartTrigger == false && Status == DcpStatus.Started)
+                {
+                    var response = await SapienceApiHandler.Instance.DeleteDcp(SapienceTraceDcpId);
+                    if (!response.IsSuccessStatusCode)
+                        return;
+
+                    SapienceTraceDcpId = "";
+                    Status = DcpStatus.Stopped;
+                    Log.Instance.WriteLog($"Trace ID = {Id} stopped.");
+                }
             }
-            else if (trigger.IsStartTrigger == false && Status == DcpStatus.Started)
+            catch (Exception ex)
             {
-                var response = await SapienceApiHandler.Instance.DeleteDcp(TraceDcpId);
-                if (!response.IsSuccessStatusCode)
-                    return;
-
-                TraceDcpId = "";
-                Status = DcpStatus.Stopped;
+                Log.Instance.WriteLog($"Trigger_TriggerReceived() for {Id}. {ex.Message}");
             }
+
+
         }
 
         [JsonProperty]
         public string Id { get; set; }
 
         [JsonProperty]
-        private string TraceDcpId { get; set; }
+        private string SapienceTraceDcpId { get; set; }
 
         [JsonProperty]
         public Equipment Equipment { get; }
