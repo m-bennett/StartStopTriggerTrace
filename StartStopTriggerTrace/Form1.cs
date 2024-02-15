@@ -58,8 +58,6 @@ namespace StartStopTriggerTrace
             TraceDcpForm = new CreateTraceDcpDlg()
             {
                 Text = $"Create Trace",
-                // ParameterList = parameterList,
-                Subscriber = SapienceApiHandler.Instance.EndpointURL,
                 EventList = eventList
             };
 
@@ -128,7 +126,6 @@ namespace StartStopTriggerTrace
             EditTraceDcpForm = new EditTraceDcpDlg()
             {
                 Text = $"Edit Trace",
-                Subscriber = SapienceApiHandler.Instance.EndpointURL,
                 Equipment = trace.Equipment,
                 CreatedTrace = trace
 

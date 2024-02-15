@@ -1,12 +1,8 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using SapienceDcpManager.Models;
 using StartStopTriggerTrace.Models;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Runtime.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using StartStopTriggerTrace.Extensions;
 using System.Configuration;
@@ -17,7 +13,6 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
     public class GemTraceDcpTrigger
     {
         private DcpInfo _dcpInfo;
-        private string _dcpId;
         private KafkaConsumer _consumer = new KafkaConsumer();
 
         public GemTraceDcpTrigger()

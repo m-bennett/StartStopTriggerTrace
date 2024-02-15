@@ -24,8 +24,6 @@ namespace StartStopTriggerTrace
 		public SapienceApiHandler()
 		{
 			SapienceServer = ConfigurationManager.AppSettings.Get("SapienceServerUrl");
-			EndpointURL = ConfigurationManager.AppSettings.Get("EndpointURL");
-			RecipeCallbackUrl = ConfigurationManager.AppSettings.Get("RecipeCallbackUrl");
 
 			httpClient = new HttpClient();
 		}
@@ -80,10 +78,6 @@ namespace StartStopTriggerTrace
 
 
 		private readonly string SapienceServer = "http://localhost";
-		public readonly string EndpointURL = "http://localhost:9098/send/callback/here/dcp";
-		public readonly string RecipeCallbackUrl = "http://localhost:9098/send/callback/here/recipe";
-
-
 
 		private KeycloakToken token;
 
@@ -589,22 +583,6 @@ namespace StartStopTriggerTrace
 			await Authorize();
 			var url = GetGetRecipesUrl(equipment);
 			var response = await httpClient.GetAsync(url);
-			return response;
-		}
-
-		public async Task<HttpResponseMessage> EquipmentRecipeNotificationsSubscribe()
-		{
-			await Authorize();
-			var url = GetRecipeSubscribeUrl();
-			JObject callback = new JObject
-			{
-				{"callbackUrl", RecipeCallbackUrl }
-			};
-			await GetExclusiveAccesss();
-			var recipeContent = new StringContent(JsonConvert.SerializeObject(callback, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
-			recipeContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-			var response = await httpClient.PostAsync(url, recipeContent);
-			await DeleteExclusiveAccess();
 			return response;
 		}
 

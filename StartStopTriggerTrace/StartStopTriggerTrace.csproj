@@ -122,7 +122,6 @@
       <DependentUpon>CreateTriggerDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="DcpInfo.cs" />
-    <Compile Include="DcpListener.cs" />
     <Compile Include="EquipmentConnectionListItem.cs" />
     <Compile Include="Event.cs" />
     <Compile Include="Extensions\ControlExtensions.cs" />
