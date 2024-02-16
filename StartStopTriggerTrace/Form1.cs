@@ -27,6 +27,7 @@ namespace StartStopTriggerTrace
             InitializeComponent();
 
             Log.Instance.MessageLogged += MessageLogged;
+            Log.Instance.WriteLog("StartStopTriggerTrace app started...");
 
             if (File.Exists(TraceDcpSaveFileName))
             {
@@ -165,6 +166,11 @@ namespace StartStopTriggerTrace
         private void btnClearLogs_Click(object sender, EventArgs e)
         {
             tbLogs.Clear();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Log.Instance.WriteLog("StartStopTriggerTrace app shutting down...");
         }
     }
 }
