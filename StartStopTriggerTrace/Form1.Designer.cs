@@ -122,7 +122,7 @@
             // 
             // btnClearLogs
             // 
-            this.btnClearLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClearLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClearLogs.Location = new System.Drawing.Point(565, 674);
             this.btnClearLogs.Margin = new System.Windows.Forms.Padding(4);
             this.btnClearLogs.Name = "btnClearLogs";
