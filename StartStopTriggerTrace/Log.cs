@@ -40,9 +40,10 @@ namespace StartStopTriggerTrace
         {
             try
             {
-                MessageLogged?.Invoke(message + Environment.NewLine);
                 var t = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                log.WriteLine($"{t} {message}");
+                var tmessage = $"{t} : {message} {Environment.NewLine}";
+                MessageLogged?.Invoke(tmessage);
+                log.Write(tmessage);
                 log.Flush();
             }
             catch(Exception)

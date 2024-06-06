@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Net;
 using System.Windows.Forms;
 
 using Formatting = Newtonsoft.Json.Formatting;
@@ -28,6 +29,8 @@ namespace StartStopTriggerTrace
 
             Log.Instance.MessageLogged += MessageLogged;
             Log.Instance.WriteLog("StartStopTriggerTrace app started...");
+
+            ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 
             if (File.Exists(TraceDcpSaveFileName))
             {

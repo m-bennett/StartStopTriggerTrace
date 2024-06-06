@@ -30,7 +30,7 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
             _dcpInfo = new DcpInfo();
         }
 
-        public async Task<HttpResponseMessage> CreateDcpFromManager()
+        public async Task<HttpResponseMessage> CreateEventTriggerDcpInSapience()
         {
             _consumer.DcpReceived += Listener_DcpReceived;
             _consumer.KafkaServer = ConfigurationManager.AppSettings.Get("KafkaServer");
@@ -51,10 +51,10 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
             _dcpInfo.RequestType = RequestType.Event;
             _dcpInfo.Equipment = Equipment;
 
-            var response = await SapienceApiHandler.Instance.CreateDcpFromManager(_dcpInfo);
+            var response = await SapienceApiHandler.Instance.CreateDcp(_dcpInfo);
             _dcpInfo.Id = await GemHelper.CheckStatusAndGetDcpId(response);
             if (String.IsNullOrEmpty(_dcpInfo.Id))
-                Log.Instance.WriteLog($"Error creating Sapience DCP for {CollectionEvent.Id}. {response.Content.ReadAsStringAsync()}");
+                Log.Instance.WriteLog($"Error creating Sapience DCP for {CollectionEvent.Id}. {await response.Content.ReadAsStringAsync()}");
             else
                 Log.Instance.WriteLog($"Sapience DCP {_dcpInfo.Id} created successfully for event ID = {_dcpInfo.EventId}.");
 

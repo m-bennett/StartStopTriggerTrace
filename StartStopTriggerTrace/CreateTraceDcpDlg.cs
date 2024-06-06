@@ -184,6 +184,7 @@ namespace StartStopTriggerTrace
                 Log.Instance.WriteLog("Retrieving equipment data...please wait...");
                 lbStartTriggers.Items.Clear();
                 lbStopTriggers.Items.Clear();
+                lbParameters.Items.Clear();
                 Equipment = (Equipment)cb.SelectedItem;
 
                 var equipmentConnection = Equipment.Connections

@@ -53,7 +53,7 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
 
             foreach (var trigger in Triggers)
             {
-                responses.Add(await trigger.CreateDcpFromManager());
+                responses.Add(await trigger.CreateEventTriggerDcpInSapience());
             }
 
             return responses;
@@ -118,8 +118,13 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
                         Parameters = Parameters
                     };
 
-                    var response = await SapienceApiHandler.Instance.CreateDcpFromManager(dcpInfo);
+                    var response = await SapienceApiHandler.Instance.CreateDcp(dcpInfo);
                     SapienceTraceDcpId = await GemHelper.CheckStatusAndGetDcpId(response);
+                    if (String.IsNullOrEmpty(SapienceTraceDcpId))
+                    {
+                        Log.Instance.WriteLog($"Error creating Sapience Trace DCP for Trace {Id} {await response.Content.ReadAsStringAsync()}");
+                        return;
+                    }
 
                     Status = DcpStatus.Started;
                     Log.Instance.WriteLog($"Trace ID = {Id} started.");
@@ -128,7 +133,10 @@ namespace StartStopTriggerTrace.GEM_Trace_DCP
                 {
                     var response = await SapienceApiHandler.Instance.DeleteDcp(SapienceTraceDcpId);
                     if (!response.IsSuccessStatusCode)
+                    {
+                        Log.Instance.WriteLog($"Error stopping Sapience Trace DCP for Trace {Id} {await response.Content.ReadAsStringAsync()}");
                         return;
+                    }
 
                     SapienceTraceDcpId = "";
                     Status = DcpStatus.Stopped;

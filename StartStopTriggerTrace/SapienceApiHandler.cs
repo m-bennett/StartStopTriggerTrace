@@ -448,14 +448,13 @@ namespace StartStopTriggerTrace
 			var response = await httpClient.GetAsync(GetValuesUri(equipment.Id, parameterIdList, equipment.Connections[0].ConnectorDetail.Id));
 			return response;
 		}
-		internal async Task<HttpResponseMessage> CreateDcpFromManager(DcpInfo dcpInfo)
+		internal async Task<HttpResponseMessage> CreateDcp(DcpInfo dcpInfo)
 		{
 			var dcp = new DataCollectionPlan()
 			{
 				Name = dcpInfo.DcpName,
 				Description = dcpInfo.Description,
-				KafkaTopic = dcpInfo.KafkaTopic,
-				Subscribers = new List<Subscriber>() { new Subscriber(dcpInfo.Subscriber) }
+				KafkaTopic = dcpInfo.KafkaTopic
 			};
 			dcp.Equipment = new Equipment(dcpInfo.Equipment.Id);
 			dcp.EquipmentConnection = new EquipmentConnection(dcpInfo.Equipment.Connections[0].Id);
